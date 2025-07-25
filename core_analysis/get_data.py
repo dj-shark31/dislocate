@@ -24,7 +24,7 @@ def main():
     parser.add_argument('--a0', required=True, help='Lattice parameter a0 (z direction)')
     parser.add_argument('--natom', required=True, help='Number of atoms in the reference cell')
     parser.add_argument('--tmp_pattern', required=True, help='Pattern file (output from get_patternInit.py or get_pattern.py)')
-    parser.add_argument('--lammps', required=True, help='Whether to run LAMMPS calculations (true/false)')
+    parser.add_argument('--energy_stress', required=True, help='Whether to run EnergyStress calculations (true/false)')
     parser.add_argument('--fitting', required=True, help='Whether to run fitting (true/false)')
     parser.add_argument('--ovito', required=True, help='Whether to run OVITO analysis (true/false)')
     parser.add_argument('--nye', required=True, help='Whether to run Nye tensor analysis (true/false)')
@@ -44,7 +44,7 @@ def main():
     tmp_stab = tempfile.NamedTemporaryFile(prefix='stab-', dir=tmp_dir, delete=False).name
     tmp_dxa = tempfile.NamedTemporaryFile(prefix='dxa-', dir=tmp_dir, delete=False).name
     tmp_fitting = tempfile.NamedTemporaryFile(prefix='fitting-', dir=tmp_dir, delete=False).name
-    tmp_lammps = tempfile.NamedTemporaryFile(prefix='lammps-', dir=tmp_dir, delete=False).name
+    tmp_energy_stress = tempfile.NamedTemporaryFile(prefix='energy_stress-', dir=tmp_dir, delete=False).name
 
     # Nye computation
     if args.nye == 'true':
@@ -67,21 +67,21 @@ def main():
         print("Ovito computation ended")
 
     # Lammps computation
-    if args.lammps == 'true':
-        print("Lammps computation started")
-        run(['python3', abspath_from_script('Lammps/get_lammps.py'),
-             args.dis_cell, tmp_lammps, args.potential_type, args.potential_path])
-        print("Lammps computation ended")
+    if args.energy_stress == 'true':
+        print("EnergyStress computation started")
+        run(['python3', abspath_from_script('EnergyStress/get_energy_stress.py'),
+             args.dis_cell, tmp_energy_stress, args.potential_type, args.potential_path])
+        print("EnergyStress computation ended")
 
     # Assemble data
     print("Data assemble started")
     run(['python3', abspath_from_script('assemble.py'),
-            args.thickness, args.a0, args.natom, tmp_babel, tmp_stab, tmp_dxa, tmp_fitting, tmp_lammps,
-            args.output_file, args.lammps, args.fitting, args.ovito, args.nye, args.pbc])
+            args.thickness, args.a0, args.natom, tmp_babel, tmp_stab, tmp_dxa, tmp_fitting, tmp_energy_stress,
+            args.output_file, args.energy_stress, args.fitting, args.ovito, args.nye, args.pbc])
     print("Data assemble ended")
 
     # Clean up temp files
-    for f in [tmp_babel, tmp_stab, tmp_dxa, tmp_fitting, tmp_lammps]:
+    for f in [tmp_babel, tmp_stab, tmp_dxa, tmp_fitting, tmp_energy_stress]:
         try:
             os.remove(f)
         except Exception:

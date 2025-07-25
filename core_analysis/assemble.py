@@ -5,8 +5,8 @@ def read_first_lines(filename, n):
     with open(filename, "r") as f:
         return [f.readline().strip() for _ in range(n)]
 
-def write_lammps_data(fout, tmp_lammps):
-    with open(tmp_lammps, "r") as f:
+def write_energy_stress_data(fout, tmp_energy_stress):
+    with open(tmp_energy_stress, "r") as f:
         stress = f.readline().strip()
         energy = f.readline().split()[0]
     fout.write('# Cell energy and stress \n')
@@ -75,9 +75,9 @@ def main():
     parser.add_argument('tmp_stab', help='Temporary stability file')
     parser.add_argument('tmp_dxa', help='Temporary DXA file')
     parser.add_argument('tmp_fitting', help='Temporary fitting file')
-    parser.add_argument('tmp_lammps', help='Temporary LAMMPS file')
+    parser.add_argument('tmp_energy_stress', help='Temporary EnergyStress file')
     parser.add_argument('output_file', help='Output file')
-    parser.add_argument('lammps', help='Whether to include LAMMPS data (true/false)')
+    parser.add_argument('energy_stress', help='Whether to include EnergyStress data (true/false)')
     parser.add_argument('fitting', help='Whether to include fitting data (true/false)')
     parser.add_argument('ovito', help='Whether to include OVITO data (true/false)')
     parser.add_argument('nye', help='Whether to include Nye tensor data (true/false)')
@@ -90,8 +90,8 @@ def main():
         fout.write(f"{args.thickness} thickness in z-direction in # of Burgers vectors \n")
         fout.write(f"{float(args.a0):.5f} Burgers vector \n")
 
-        if args.lammps == 'true':
-            write_lammps_data(fout, args.tmp_lammps)
+        if args.energy_stress == 'true':
+            write_energy_stress_data(fout, args.tmp_energy_stress)
 
         if args.ovito == 'true':
             write_dxa_data(fout, args.tmp_dxa)
