@@ -14,7 +14,7 @@ The `core_analysis` directory contains a modular Python workflow for analyzing d
 - `main.py`: Orchestrates the full workflow for multiple dislocation configurations.
 - `get_data.py`: Runs the workflow for a single configuration (used internally).
 - `assemble.py`: Assembles results from all analysis steps into a final output file.
-- `Babel/`, `Lammps/`, `OvitoFitting/`, `Pattern/`: Submodules for specific analysis tasks.
+- `Babel/`, `EnergyStress/`, `OvitoFitting/`, `Pattern/`: Submodules for specific analysis tasks.
 - `input_file_template`: Example input file for running the workflow.
 
 ## How the Workflow Operates
@@ -28,12 +28,12 @@ The `core_analysis` directory contains a modular Python workflow for analyzing d
      ```bash
      python main.py input_file ncore
      ```
-     - `input_file`: Path to your input file (see template below).
+     - `input_file`: Path to your input file (see template below). Path provided in input_file can be relative to the working directory
      - `ncore`: Number of CPU cores to use for parallel processing.
 
 3. **Analysis Steps (Automated):**
    - **Pattern Generation:** Generates stacking fault patterns if requested.
-   - **LAMMPS Calculation:** Computes energies and stresses if enabled.
+   - **Energy and Stress Calculation:** Computes energies and stresses if enabled.
    - **OVITO Analysis:** Extracts dislocation positions and atomic properties.
    - **Nye Tensor Calculation:** Computes Nye tensor fields if enabled.
    - **Fitting:** Fits core properties from the extracted data.
@@ -41,27 +41,6 @@ The `core_analysis` directory contains a modular Python workflow for analyzing d
 
 4. **Output:**  
    - Results are written to the files specified in the `output_files` field of your input file.
-
-## Example Input File
-
-See `core_analysis/input_file_template` for a complete example. Key fields include:
-
-```
-thickness=2
-output_files="/path/to/output1.dat /path/to/output2.dat"
-ref_cell="/path/to/reference_POSCAR"
-dis_cells="/path/to/dislocation1 /path/to/dislocation2"
-lammps=true
-ovito=true
-nye=true
-sf=true
-oxygen=0
-potential_type=MEAM
-potential_path='/path/to/potential'
-pbc=false
-config=S
-nx=32
-```
 
 ## Minimal Example Command
 
@@ -73,12 +52,11 @@ python main.py input_file 4
 
 ## Advanced Usage
 
-- **Single Configuration:** Use `get_data.py` for running the workflow on a single configuration with command-line arguments.
-- **Custom Analysis:** Modify or extend scripts in the `Babel/`, `Lammps/`, `OvitoFitting/`, or `Pattern/` subdirectories for specialized analysis.
+- **Custom Analysis:** Modify or extend scripts in the `Babel/`, `EnergyStress/`, `OvitoFitting/`, or `Pattern/` subdirectories for specialized analysis.
 
 ## Requirements
 
 - Python 3.x
 - ASE, NumPy, Pandas, Matplotlib, and other scientific Python libraries
-- LAMMPS (for energy/stress calculations)
 - OVITO (for structure analysis, via Singularity container if needed) 
+- Babel (for Nye tensor calculation)
