@@ -15,8 +15,8 @@ dis_cells="/path/to/dislocation1 /path/to/dislocation2"
 # Reference Dislocation cell files (cells where atoms have the same order as reference cell)
 ref_dis_cells="/path/to/ref_dislocation1 /path/to/ref_dislocation2"
 
-# Whether to run LAMMPS calculations (true/false)
-lammps=true
+# Whether to run Energy and Stress calculations (true/false)
+energy_stress=true
 
 # Whether to replicate the reference POSCAR along z (nrep > 1 triggers replication)
 nrep=1
