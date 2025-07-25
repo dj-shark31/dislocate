@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Python equivalent of get_lammps.sh using ASE LAMMPSlib
-Runs LAMMPS calculations using ASE's LAMMPSlib calculator
+Python equivalent of get_energy_stress.sh using ASE LAMMPSlib
+Runs EnergyStress calculations using ASE's LAMMPSlib calculator or MACE calculator
 """
 
 import argparse
@@ -56,9 +56,9 @@ def run_calculation(atoms, potential_type, potential_path):
             calc.clean()
 
 def main():
-    parser = argparse.ArgumentParser(description='Run LAMMPS with different potentials using ASE LAMMPSlib')
+    parser = argparse.ArgumentParser(description='Run EnergyStress calculations using ASE LAMMPSlib or MACE calculator')
     parser.add_argument('dis_cell', help='Dislocation cell POSCAR file')
-    parser.add_argument('tmp_lammps', help='Output file for LAMMPS results')
+    parser.add_argument('tmp_energy_stress', help='Output file for EnergyStress results')
     parser.add_argument('potential_type', choices=['MEAM', 'DMD', 'RANN', 'ACE', 'MACE'],
                        help='Potential type to use')
     parser.add_argument('potential_path', help='Path to potential file')
@@ -69,7 +69,7 @@ def main():
     try:
         atoms = read(args.dis_cell, format='vasp')
         stress, energy = run_calculation(atoms, args.potential_type, args.potential_path)
-        with open(args.tmp_lammps, 'w') as f:
+        with open(args.tmp_energy_stress, 'w') as f:
             if stress is not None:
                 stress_str = ' '.join([f"{s:.6f}" for s in stress])
                 f.write(f"{stress_str} sxx syy szz syz sxz sxy (MPa)\n")
@@ -77,7 +77,7 @@ def main():
                 f.write(f"{energy:.6f} toteng (eV)\n")
     except Exception as e:
         print(f"Error in main execution: {e}")
-        with open(args.tmp_lammps, 'w') as f:
+        with open(args.tmp_energy_stress, 'w') as f:
             pass
 
 if __name__ == "__main__":

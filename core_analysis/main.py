@@ -112,7 +112,7 @@ def main():
     ref_cell = config['ref_cell']
     output_files = shlex.split(config['output_files'])
     dis_cells = shlex.split(config['dis_cells'])
-    lammps = config.get('lammps', 'true').lower()
+    energy_stress = config.get('energy_stress', 'true').lower()
     fitting = config.get('fitting', 'true').lower()
     ovito = config.get('ovito', 'true').lower()
     nye = config.get('nye', 'true').lower()
@@ -178,7 +178,7 @@ def main():
         job_args.append([
             '--ref_cell', ref_cell, '--thickness', thickness, '--a0', a0, 
             '--natom', natom, '--tmp_pattern', tmp_pattern,
-            '--lammps', lammps, '--fitting', fitting, '--ovito', ovito, '--nye', nye,
+            '--energy_stress', energy_stress, '--fitting', fitting, '--ovito', ovito, '--nye', nye,
             '--oxygen', oxygen, '--pbc', pbc,
             '--dis_cell', dis_cell, '--output_file', output_file, '--config', config_str,
             '--potential_type', potential_type, '--potential_path', potential_path
