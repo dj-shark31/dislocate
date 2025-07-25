@@ -1,0 +1,20 @@
+&input
+ 
+  ! radius of the neighbourhood sphere
+  rNeigh=1.35	! (normalized by alat)
+  max_nNeigh=12
+
+  ! Scaling factor for the distances (lattice parameter)
+  alat=A0
+
+  duplicate=.DUPLICATE.
+  lat(3)=NREP
+  imm=IMM
+  clipAtom=.true.
+  
+  ! Reference structure (perfect crystal)
+  refFile='REFFILE'
+  refPoscar=.true.
+
+  patternFile='OUTPATTERN'
+//
