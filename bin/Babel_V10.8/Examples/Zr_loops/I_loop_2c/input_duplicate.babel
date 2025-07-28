@@ -1,0 +1,23 @@
+	&input
+
+	  duplicate=.true.
+	  lat(1)=20
+	  lat(2)=20
+	  lat(3)=20
+	
+	  imm=16000
+	
+	  alat=3.220
+	
+	  translate=.true.
+	  uTranslate(1)=-5.0
+	  uTranslate(2)=-8.6602540378443864680
+	  uTranslate(3)=-16.19565217390
+
+	  inpCfg=.true.
+	  inpFile="zr.cfg"
+	  outXyz=.true.
+	  outFile="zr_duplicated.xyz"
+	  out_alat=3.220
+	
+	&end

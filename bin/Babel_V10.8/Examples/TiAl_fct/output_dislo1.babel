@@ -1,0 +1,179 @@
+ 
+  Program babel                (V10.7 - February 2022)
+        (c) SRMP - CEA Saclay - France
+   contact: emmanuel.clouet@cea.fr
+ 
+  Execution time: 2022-03-07  11:58:14.678
+ 
+ 
+===========================
+ 
+Input structure
+  number of atoms: 288
+  gravity center located in:    19.7771       19.7470      0.706930    
+  unit cell vectors:
+    at(1:3,1):    39.6798956856     -0.177635683940E-13   0.00000000000    
+    at(1:3,2):   0.742101729566       41.8171051417       0.00000000000    
+    at(1:3,3):    0.00000000000       0.00000000000       2.82772001797    
+  corresponding volume    4692.03121634      (    16.2917750567     / atom )
+ 
+===========================
+ 
+Input parameters
+ 
+ Elastic constants in Voigt notation (GPa)
+   |    234.38       29.606       78.662       0.0000       0.0000      -25.729     |
+   |    29.606       241.91       71.838       0.0000       0.0000       15.659     |
+   |    78.662       71.838       193.50       0.0000       0.0000       9.1335     |
+   |    0.0000       0.0000       0.0000       64.414       33.021       0.0000     |
+   |    0.0000       0.0000       0.0000       33.021       89.086       0.0000     |
+   |   -25.729       15.659       9.1335       0.0000       0.0000       56.606     |
+ Inverse matrix (GPa^-1)
+   |   0.53547E-02 -0.17211E-03 -0.22472E-02   0.0000       0.0000      0.28441E-02 |
+   |  -0.17211E-03  0.47101E-02 -0.16259E-02   0.0000       0.0000     -0.11188E-02 |
+   |  -0.22472E-02 -0.16259E-02  0.67636E-02   0.0000       0.0000     -0.16629E-02 |
+   |    0.0000       0.0000       0.0000      0.19167E-01 -0.71043E-02   0.0000     |
+   |    0.0000       0.0000       0.0000     -0.71043E-02  0.13858E-01   0.0000     |
+   |   0.28441E-02 -0.11188E-02 -0.16629E-02   0.0000       0.0000      0.19537E-01 |
+    elastic constants are not isotropic
+    relative noise to add to elastic constants for line defects:   0.100000E-05
+ 
+ Dislocation dipoles created from anisotropic elasticity theory
+  Dislocation dipole 1
+    line vector:            0.00000       0.00000       1.00000    
+    Burgers vector (A):     0.00000       0.00000       2.82772    
+    center 1 (A) for +b:    10.1055       10.4543       0.00000    
+    center 2 (A) for -b:    30.3165       31.3628       0.00000    
+    corresponding rotation matrix:
+                  0.6950            0.7190            0.0000
+                 -0.7190            0.6950            0.0000
+                  0.0000            0.0000            1.0000
+ 
+  Periodicity in x direction (20 images considered)
+    periodicity vector: at(1:3,1) =    39.6799     -0.177636E-13   0.00000    
+  Periodicity in y direction (20 images considered)
+    periodicity vector: at(1:3,2) =   0.742102       41.8171       0.00000    
+  No periodicity in z direction (0 image considered)
+  Periodic boundary conditions to atom displacements are not applied
+  Add displacement field to initial atom coordinates
+ 
+  Lagrangian coordinates are used (max_Euler=0)
+===========================
+ 
+Initialization for dislocation dipoles
+ 
+ 
+A noise has been added to elastic constants for creating dislocations
+  absolute amplitude of the noise:  0.735599E-04
+   |    234.38       29.606       78.662      0.98058E-05  0.56410E-05  -25.729     |
+   |    29.606       241.91       71.838     -0.21448E-05  0.75941E-05   15.659     |
+   |    78.662       71.838       193.50     -0.15027E-05  0.40617E-05   9.1335     |
+   |   0.98058E-05 -0.21448E-05 -0.15027E-05   64.414       33.021      0.81336E-05 |
+   |   0.56410E-05  0.75941E-05  0.40617E-05   33.021       89.086      0.87841E-05 |
+   |   -25.729       15.659       9.1335      0.81336E-05  0.87841E-05   56.606     |
+ Initialization for dislocation dipole 1
+    Burgers vector in rotated axes (A):    0.00000       0.00000       2.82772    
+    line direction in rotated axes :    0.00000       0.00000       1.00000    
+    cut direction in rotated axes :    29.0801      0.177636E-14   0.00000    
+  elastic constants in rotated axes
+   |    182.00       75.812       84.263     -0.29229E-05  0.19177E-04   24.314     |
+   |    75.812       201.88       66.237     -0.12687E-05 -0.44701E-05  -20.210     |
+   |    84.263       66.237       193.50     -0.39647E-05  0.17425E-05  -3.7198     |
+   |  -0.29229E-05 -0.12687E-05 -0.39647E-05   44.166      -13.449     -0.48298E-05 |
+   |   0.19177E-04 -0.44701E-05  0.17425E-05  -13.449       109.33     -0.40209E-05 |
+   |    24.314      -20.210      -3.7198     -0.48298E-05 -0.40209E-05   102.81     |
+ 
+  Elastic energy of the isolated dipole: Edipole = 2*E0 + K0 ln(|d|/rc)
+  prelogarithmic energy factor:
+     K0 =    86.7613098863      -  units = elastic constant * distance^2 (GPa.A^2)
+        =   0.541521538119      -  units = energy / distance (eV.A^-1)
+        =    68.1762573063    *b^2/2pi  -  units = elastic constant (GPa)
+  angular dependence of the energy
+    E0 =   -8.09373865822      -  units = elastic constant * distance^2 (GPa.A^2)
+       =  -0.505171465607E-01  -  units = energy / distance (eV.A^-1)
+       =   -6.35998707322    *b^2/2pi  -  units = elastic constant (GPa)
+  separation distance of the dipole
+    d =    29.0800969628      -  units = distance (A)
+  Stroh prelogarithmic tensor appearing in interaction energy: E = bi^1 Kij bj^2 ln(R/r)  (original axes)
+           |    14.7029500125     -0.409667794922      0.761582364850E-06 | 
+     Kij = |  -0.409667794922       15.0092212971      0.204005632988E-06 |  units = elastic constant (GPa)
+           |   0.761582364850E-06  0.204005632988E-06   10.8505883518     | 
+    check for dipole self-energy: K0 ?= bi Kij bj =   0.541521538119      -  units = energy / distance (eV.A^-1)
+ 
+ 
+ Displacement gradient equivalent to dislocation dipole distribution
+  e(1,1:3) = |   0.000        0.000        0.000       |
+  e(2,1:3) = |   0.000        0.000        0.000       |
+  e(3,1:3) = |  0.3563E-01  -0.3444E-01    0.000       |
+   area =    1659.2983698999    
+ 
+ 
+--------------
+ 
+Homogeneous strain, applied and resulting from all line-defects
+  e(1,1:3) = |   0.00000        0.00000        0.00000       |
+  e(2,1:3) = |   0.00000        0.00000        0.00000       |
+  e(3,1:3) = |  0.356316E-01  -0.344429E-01    0.00000       |
+ 
+--------------
+ 
+ 
+===========================
+ 
+ Elastic energy calculation with core cutoff radius  rc =    3.99900    
+   factor used to convert [Stress]*[Distance]^3 in [Energy]:  factorE =   0.624151E-02
+   ( 1 GPa * 1 A^3 =   0.624151E-02 eV )
+  unit length for line defects =    2.82772    
+ 
+  Dipole 1
+    Edipole = E0 - K0 ln(rc) = 2 A(theta) + K0 ln(|d|/rc) =    2.7523603     =   0.97334967     per unit length
+ 
+  Homogeneous strain contribution:                     E0 =    1.5882843     =   0.56168371     per unit length
+                 interaction with dislocation dipoles: E0 =   -3.1765685     =   -1.1233674     per unit length
+ 
+  Dislocation interaction with image line-defects
+                                image dislocations:    E0 =   0.87251885     =   0.30855914     per unit length
+ 
+--------------
+ 
+ Total elastic energy :    E = E0 - K0 ln(rc) - K2 / rc^2 =    2.0365949     =   0.72022510     per unit length
+       with E0 =    4.1590048     =    1.4707980     per unit length
+            K0 =    1.5312713     =   0.54152154     per unit length
+            K2 =    0.0000000     =    0.0000000     per unit length
+ 
+===========================
+ 
+   forces given in [Energy]/[Distance]^2 -> eV/A²
+   factor used to convert [Stress]*[Distance]^3 in [Energy]:  factorE =   0.624151E-02
+   ( 1 GPa * 1 A^3 =   0.624151E-02 eV )
+ 
+Displacement, applied strain, stress, and force on all dislocation dipoles
+ 
+  dislocation 1 of dipole 1:
+    displacement: u(1:3) =  -0.503898E-09  0.154563E-08 -0.693857E-01 !!!! EXPERIMENTAL !!!!
+    strain: e(1:6) =   0.950816E-09 -0.900429E-09 -0.700254E-09 -0.159699E-05  0.659025E-05  0.112245E-08
+    stress: s(1:6) =   0.112231E-06 -0.222401E-06 -0.115139E-06  0.114748E-03  0.534365E-03  0.185780E-07
+    Peach-Koehler force: F(1:3) =   0.202522E-05 -0.943114E-05   0.00000    
+ 
+  dislocation 2 of dipole 1:
+    displacement: u(1:3) =   0.342967E-07 -0.171989E-07 -0.966229E-01 !!!! EXPERIMENTAL !!!!
+    strain: e(1:6) =   0.950816E-09 -0.900429E-09 -0.700254E-09 -0.159699E-05  0.659025E-05  0.112245E-08
+    stress: s(1:6) =   0.112231E-06 -0.222401E-06 -0.115139E-06  0.114748E-03  0.534365E-03  0.185780E-07
+    Peach-Koehler force: F(1:3) =  -0.202522E-05  0.943114E-05   0.00000    
+ 
+===========================
+ 
+Create dislocation dipoles
+Apply homogeneous strain
+Homogeneous strain applied to unit cell vectors
+  new unit cell vectors:
+    at(1:3,1):    39.6798956856     -0.177635683940E-13   1.41386000898    
+    at(1:3,2):   0.742101729566       41.8171051417      -1.41386000898    
+    at(1:3,3):    0.00000000000       0.00000000000       2.82772001797    
+  corresponding volume    4692.03121634      (    16.2917750567     / atom )
+ 
+ 
+Write output structure with Cfg format in file tial_fct_dislo1.cfg                                                                                 
+  Displacement field is added to initial atom coordinates
+  Equivalent homogeneous strain is applied to periodicity vectors
+ 

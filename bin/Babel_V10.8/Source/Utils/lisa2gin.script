@@ -1,0 +1,32 @@
+
+printUsage() {
+	echo "Usage: $0 input_file output_file"
+	echo "  input file with lisa format"
+	echo "  output file with gin format"
+	exit 1
+}
+
+if [ $# \< 2 ]; then
+	printUsage
+fi
+
+lisaFile=$1
+ginFile=$2
+
+if [ ! -f $lisaFile ]; then
+	echo "file $lisaFile does not exist"
+	exit
+fi
+
+tmpFile=`mktemp`
+echo > $tmpFile "
+&input
+  verbosity=0
+  inpLisa=.true.
+  inpFile='$lisaFile'
+  outGin=.true.
+  outFile='$ginFile'
+&end
+" 
+$babel $tmpFile
+rm -f $tmpFile

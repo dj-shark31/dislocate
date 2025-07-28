@@ -1,0 +1,648 @@
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<TITLE>
+		Program displacement
+	</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<div style="text-align:right"><font size="2">
+						Back to 
+						<a href="./index.html">main page</a>,
+						<a href="./input_babel.html">babel</a>,
+						<a href="./input_displacement.html">displacement</a>,
+						<a href="./input_patternInit.html">patternInit</a>,
+						<a href="./input_patternDetect.html">patternDetect</a>,
+						<a href="./input_prepareDrag.html">prepareDrag</a>,
+						<a href="./structures.html">structures</a></font></div>
+<h1 id="headTitle">
+		Program displacement
+	</h1>
+<div style="white-space: pre-line;"> 
+		This program calculates atom displacements between 2 configurations
+		an input and a reference structure files.
+		The value of the total strain in the input structure can be calculated 
+		on each atom by finite differences using this displacement field 
+		and its variation in a neighbourhood sphere.
+
+		The progam can also calculate elastic and plastic strain, Nye tensors,
+	       	density of Burgers vector using the method described in:
+			C. S. Hartley and Y. Mishin, Acta Mater. 53, 1313 (2005).
+		Reference crystallographic patterns have to be defined 
+		to associate each atom with one of these patterns.
+		See variables: patternFile, patternAngleThreshold, patternSelectionMethod, rNeigh
+	
+
+		Execution:
+		=========
+		displacement input.dat
+		where input.dat is the input file
+		If input.dat="-", the input is read from current unit (keyboard or piped other command like echo)
+
+
+		Structure of the input file:
+		===========================
+
+		The input file contains only the namelist input
+
+		&amp;input
+		  ...
+		//
+
+	</div>
+<h2 id="input">
+			Namelist  input <a href="#headTitle">↑</a>
+</h2>
+<i>Variables: </i><a href="#inpFile,%20refFile">inpFile, refFile</a>,
+		<a href="#inpXyz,%20inpCfg,%20inpGin,%20inpSiesta,%20inpNDM,%20inpLammps,%20inpPoscar">inpXyz, inpCfg, inpGin, inpSiesta, inpNDM, inpLammps, inpPoscar</a>,
+		<a href="#refXyz,%20refCfg,%20refGin,%20refSiesta,%20refNDM,%20refLammps,%20refPoscar">refXyz, refCfg, refGin, refSiesta, refNDM, refLammps, refPoscar</a>,
+		<a href="#imm">imm</a>,
+		<a href="#duplicate">duplicate</a>,
+		<a href="#lat">lat</a>,
+		<a href="#rotate">rotate</a>,
+		<a href="#rot">rot</a>,
+		<a href="#translate">translate</a>,
+		<a href="#uTranslate">uTranslate</a>,
+		<a href="#clipAtom">clipAtom</a>,
+		<a href="#clipDisplacement">clipDisplacement</a>,
+		<a href="#alat">alat</a>,
+		<a href="#fixGravity">fixGravity</a>,
+		<a href="#patternFile">patternFile</a>,
+		<a href="#patternAngleThreshold">patternAngleThreshold</a>,
+		<a href="#patternSelectionMethod">patternSelectionMethod</a>,
+		<a href="#rNeigh">rNeigh</a>,
+		<a href="#max_nNeigh">max_nNeigh</a>,
+		<a href="#bNye">bNye</a>,
+		<a href="#lNye">lNye</a>,
+		<a href="#outFile">outFile</a>,
+		<a href="#outXyz,%20outCfg,%20outOnlyAtoms,%20outLammps,%20outPoscar">outXyz, outCfg, outOnlyAtoms, outLammps, outPoscar</a>,
+		<a href="#out_alat">out_alat</a>,
+		<a href="#initial">initial</a>,
+		<a href="#out_displacement">out_displacement</a>,
+		<a href="#out_gradDisplacement">out_gradDisplacement</a>,
+		<a href="#out_strain">out_strain</a>,
+		<a href="#EulerLagrange">EulerLagrange</a>,
+		<a href="#out_gradElasticDisplacement">out_gradElasticDisplacement</a>,
+		<a href="#out_elasticStrain">out_elasticStrain</a>,
+		<a href="#out_plasticStrain">out_plasticStrain</a>,
+		<a href="#out_nye">out_nye</a>,
+		<a href="#out_BurgersDensity">out_BurgersDensity</a>,
+		<a href="#out_neighbours">out_neighbours</a>,
+		<a href="#out_pattern">out_pattern</a>,
+		<a href="#verbosity">verbosity</a>,
+		<a href="#debug">debug</a>,
+		<div style="white-space: pre-line;"></div>
+<ul>
+<b id="inpFile, refFile">	inpFile, refFile </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  character string , 
+			<i>default</i>:  '-' ,
+			<i>mandatory</i>:  yes )
+			<div style="white-space: pre-line;">
+				Name of the structure file used as input (strained) and reference.
+				If inpFile='-' or refFile="-", the structure is read from keyboard.
+				The file formats are defined by refXyz | refCfg | refGin | refSiesta | refNDM | refLammps | refPoscar
+				and by inpXyz | inpCfg | inpGin | inpSiesta | inpNDM | inpLammps | inpPoscar
+
+				Reference structure file is needed only if one wants to compute
+				the total displacement or its gradient, or the total or plastic strain.
+			</div>
+<br><i>See also: </i><a href="#inpXyz,%20inpCfg,%20inpGin,%20inpSiesta,%20inpNDM,%20inpLammps,%20inpPoscar">inpXyz, inpCfg, inpGin, inpSiesta, inpNDM, inpLammps, inpPoscar</a>
+				,
+				<a href="#refXyz,%20refCfg,%20refGin,%20refSiesta,%20refNDM,%20refLammps,%20refPoscar">refXyz, refCfg, refGin, refSiesta, refNDM, refLammps, refPoscar</a>
+</ul>
+<br><br><b id="inpXyz, inpCfg, inpGin, inpSiesta, inpNDM, inpLammps, inpPoscar">	inpXyz, inpCfg, inpGin, inpSiesta, inpNDM, inpLammps, inpPoscar  </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  one should be set to .true. )
+			<div style="white-space: pre-line;">
+				If inpXyz=.true. the input structure file 
+				is given in xyz format.
+			</div>
+<br><i>See also: </i><a href="./structures.html">Structure file formats</a>
+				,
+				<a href="#inpFile,%20refFile">inpFile, refFile</a>
+</ul>
+<br><br><b id="refXyz, refCfg, refGin, refSiesta, refNDM, refLammps, refPoscar">	refXyz, refCfg, refGin, refSiesta, refNDM, refLammps, refPoscar  </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  one should be set to .true. )
+			<div style="white-space: pre-line;">
+				If refXyz=.true. the reference structure file 
+				is given in xyz format.
+			</div>
+<br><i>See also: </i><a href="./structures.html">Structure file formats</a>
+				,
+				<a href="#inpFile,%20refFile">inpFile, refFile</a>
+</ul>
+<br><br><b id="imm">	imm </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  integer , 
+			<i>default</i>:  0 ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Maximal number of atom in the structure.
+				imm needs to be defined if the input structure is duplicated 
+				to dimension the arrays. 
+				Otherwise, the actual number of atoms, read from input structure file, is used.
+			</div>
+<br><i>See also: </i><a href="#duplicate">duplicate</a>
+</ul>
+<br><br><b id="duplicate"> duplicate </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If duplicate=.true., the crystal is duplicated, both the input and reference strutures.
+				lat(1:3) is the number of times the crystal should be duplicated
+				in each direction given by the vectors at(1:3,i) read in the structure file.
+				If lat(i) is negative, then the opposite of the vector at(1:3,i) is used.
+				The maximal number of atoms in the duplicated structure needs to be set with imm
+				and the periodicity vectors have to be defined.
+
+				When the structure is also rotated, the duplication is done first and then the rotation.
+				The periodicity vectors used for duplication are thus those before rotation.
+
+				For small simulation boxes, it may be necessary to duplicate the structure 
+				to find all neighbours of the atoms, when neighbours are needed
+				(to extract Nye tensors or calculate strain for instance)
+			</div>
+<br><i>See also: </i><a href="#imm">imm</a>
+				,
+				<a href="#lat">lat</a>
+</ul>
+<br><br><b id="lat">	lat </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  integer, dim(3) , 
+			<i>default</i>:  1 ,
+			<i>mandatory</i>:  no  )
+			<div style="white-space: pre-line;">
+				Number of replicas in each direction when duplicating the structure files.
+			</div>
+<br><i>See also: </i><a href="#duplicate">duplicate</a>
+</ul>
+<br><br><b id="rotate"> rotate </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If rotate=.true., the crystal is rotated using rotation matrix defined in rot(1:3,1:3)
+				Both the input and reference structures are rotated.
+			</div>
+<br><i>See also: </i><a href="#rot">rot</a>
+</ul>
+<br><br><b id="rot"> rot </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  real, dim(3,3) , 
+			<i>default</i>:  identity matrix ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Rotation matrix used when rotate=.true.
+			</div>
+<br><i>See also: </i><a href="#rotate">rotate</a>
+</ul>
+<br><br><b id="translate"> translate </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If translate=.true., the crystal is translated with the vector uTranslate(1:3)
+				Both the input and reference structures are translated.
+			</div>
+<br><i>See also: </i><a href="#uTranslate">uTranslate</a>
+</ul>
+<br><br><b id="uTranslate"> uTranslate </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  real, dim(3) , 
+			<i>default</i>:  0. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Translation vector used when translate=.true.
+				If alat is defined, uTranslate(1:3) is multiplied by alat.
+			</div>
+<br><i>See also: </i><a href="#translate">translate</a>
+				,
+				<a href="#alat">alat</a>
+</ul>
+<br><br><b id="clipAtom"> clipAtom </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If clipAtom=.true., periodic boundary conditions are applied
+			       	to atom coordinates to bring them back in the primitive unit cell.
+				The periodicity vectors have to be defined.
+				The transformation is applied both to the input and the reference structures.
+			</div>
+</ul>
+<br><br><b id="clipDisplacement"> clipDisplacement </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If clipDisplacement=.true., periodic boundary conditions are applied
+				to atom displacements.
+				The periodicity vectors have to be defined.
+			</div>
+</ul>
+<br><br><b id="alat"> alat </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  real , 
+			<i>default</i>:  1. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Length used to scale all distances in the present input file.
+				For program displacement, it affects the quantities rNeigh and uTranslate(1:3).
+			</div>
+</ul>
+<br><br><b id="fixGravity"> fixGravity </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If fixGravity=.true., a solid displacement is added to atom positions
+				in the input structure to keep fixed the gravity center compared 
+				to the reference structure. 
+				The same solid displacement is added to the calculated atom displacements. 
+				As a consequence, the displacement average is null.
+			</div>
+</ul>
+<br><br><b id="patternFile"> patternFile </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  character string , 
+			<i>default</i>:  empty ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Name of the file where are stored the crystallographic patterns 
+				defining the atom reference neighbourhoods.
+				This is necessary to calculate elastic or plastic strains, 
+				Nye tensors or Burgers density.
+			        This file can then be generated with programs patternInit or patternDetect.
+			</div>
+<br><i>See also: </i><a href="#patternAngleThreshold">patternAngleThreshold</a>
+				,
+				<a href="#patternSelectionMethod">patternSelectionMethod</a>
+</ul>
+<br><br><b id="patternAngleThreshold"> patternAngleThreshold </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  real , 
+			<i>default</i>:  10. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Threshold angle for pairing neighbour vectors when associating 
+				each atom with a reference crystallographic pattern.
+				Two bonds, in the atom neighbourhood of the input structure
+				and in the reference crystallographic pattern, match 
+				if the angle difference between the two corresponding directions 
+				is smaller than this threshold.
+			</div>
+<br><i>See also: </i><a href="#patternFile">patternFile</a>
+				,
+				<a href="#patternSelectionMethod">patternSelectionMethod</a>
+</ul>
+<br><br><b id="patternSelectionMethod"> patternSelectionMethod </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  integer , 
+			<i>default</i>:  3 ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Method used to associate a reference crystallographic pattern to each atom
+				by comparing the atomic bonds of the corresponding neighbourhoods
+				patternSelectionMethod
+                                  = 1 : Select pattern which maximises the number of matchs 
+                                        look to the NORM OF THE DISPLACEMENT if 2 patterns are equivalent
+                                  = 2 : Select pattern which maximises the number of matchs 
+                                        look to the norm of the ELASTIC GRADIENT if 2 patterns are equivalent
+                                  = 3 : Select pattern which minimizes the number of unmatched bonds 
+                                        look to the NORM OF THE DISPLACEMENT if 2 patterns are equivalent
+                                  = 4 : Select pattern which minimizes the number of unmatched bonds 
+                                        look to the norm of the ELASTIC GRADIENT if 2 patterns are equivalent
+			</div>
+<br><i>See also: </i><a href="#patternFile">patternFile</a>
+				,
+				<a href="#patternAngleThreshold">patternAngleThreshold</a>
+</ul>
+<br><br><b id="rNeigh"> rNeigh </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  real , 
+			<i>default</i>:  -1. ,
+			<i>mandatory</i>:  yes )
+			<div style="white-space: pre-line;">
+				Distance cutoff defining the sphere where atom neighbours have to be looked for.
+				If alat is defined, rNeigh is multiplied by alat.
+			</div>
+<br><i>See also: </i><a href="#alat">alat</a>
+</ul>
+<br><br><b id="max_nNeigh"> max_nNeigh </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  integer , 
+			<i>default</i>:  16 ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Maximal number of neighbours allowed for each atom.
+			</div>
+</ul>
+<br><br><b id="bNye"> bNye </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  real, dim(3) , 
+			<i>default</i>:  0. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Direction of the Burgers vector when projecting the Nye tensor 
+				to define dislocation density.
+			</div>
+<br><i>See also: </i><a href="#lNye">lNye</a>
+</ul>
+<br><br><b id="lNye"> lNye </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  real, dim(3) , 
+			<i>default</i>:  0. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Direction of the dislocation lines when projecting the Nye tensor 
+				to define dislocation density.
+			</div>
+<br><i>See also: </i><a href="#bNye">bNye</a>
+</ul>
+<br><br><b id="outFile"> outFile </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  character string , 
+			<i>default</i>:  '-' ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Name of the structure file where to save the input or the reference structure,
+				depending of the value of variable 'initial',
+				which auxiliary properties set for each atom (displacement, strain, dislocation density, ...)
+				If outFile="-", the output file is printed on screen.
+				The file format is defined by outXyz | outCfg  | outOnlyAtoms
+			</div>
+<br><i>See also: </i><a href="#outXyz,%20outCfg,%20outOnlyAtoms,%20outLammps,%20outPoscar">outXyz, outCfg, outOnlyAtoms, outLammps, outPoscar</a>
+				,
+				<a href="#initial">initial</a>
+				,
+				<a href="#out_alat">out_alat</a>
+</ul>
+<br><br><b id="outXyz, outCfg, outOnlyAtoms, outLammps, outPoscar"> outXyz, outCfg, outOnlyAtoms, outLammps, outPoscar </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Format of the structure file used for output.
+				If all variables are set to .false. (default), the output structure
+				is not written.
+			</div>
+<br><i>See also: </i><a href="#outFile">outFile</a>
+</ul>
+<br><br><b id="out_alat"> out_alat </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  real , 
+			<i>default</i>:  1. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				When the output structure is written with xyz or cfg file format,
+				atomic positions and periodicity vectors can be scaled by a lattice parameter
+				given in out_alat.
+			</div>
+<br><i>See also: </i><a href="#outFile">outFile</a>
+				,
+				<a href="./structures.html">Structure file formats</a>
+</ul>
+<br><br><b id="initial"> initial </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If initial=.true. (.false.), the coordinates of the input (reference) structure
+			       	are used on output.
+			</div>
+</ul>
+<br><br><b id="out_displacement"> out_displacement </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .true. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If out_displacement=.true., the displacement defined on each atom
+				is printed in output structure file.
+			</div>
+</ul>
+<br><br><b id="out_gradDisplacement"> out_gradDisplacement </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If out_gradDisplacement=.true., the gradient of the displacement 
+				defined on each atom is printed in output structure file.
+				The gradient is obtained from atom displacements by finite differences.
+				rNeigh needs to have been set to define atom neighbourhood used for finite differences.
+			</div>
+</ul>
+<br><br><b id="out_strain"> out_strain </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If out_strain=.true., the total strain defined on each atom
+				is printed in output structure file.
+				The total strain is obtained from the gradient of the total displacement
+				using Green-Lagrange (default) or Euler-Lagrange definition.
+			</div>
+<br><i>See also: </i><a href="#out_gradDisplacement">out_gradDisplacement</a>
+				,
+				<a href="#EulerLagrange">EulerLagrange</a>
+</ul>
+<br><br><b id="EulerLagrange"> EulerLagrange </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If EulerLagrange=.true., the Euler Lagrange definition is used 
+				to obtain strain from displacement gradient.
+				If EulerLagrange=.false., the Green Lagrange definition is used.
+			</div>
+<br><i>See also: </i><a href="#out_strain">out_strain</a>
+				,
+				<a href="#out_elasticStrain">out_elasticStrain</a>
+</ul>
+<br><br><b id="out_gradElasticDisplacement"> out_gradElasticDisplacement </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If out_gradElasticDisplacement=.true., the gradient of the elastic displacement 
+				defined on each atom is printed in output structure file.
+				The gradient is obtained from atom displacements by finite differences,
+				using only the elastic contribution to the displacement.
+				Reference crystallographic patterns, read in file defined by patternFile,
+				are used to calculate this elastic contribution.
+				rNeigh needs to have been set to define atom neighbourhood used for finite differences.
+			</div>
+</ul>
+<br><br><b id="out_elasticStrain"> out_elasticStrain </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If out_elasticStrain=.true., the elastic strain defined on each atom
+				is printed in output structure file.
+				The elastic strain is obtained from the gradient of the elastic displacement
+				using Green-Lagrange (default) or Euler-Lagrange definition.
+			</div>
+<br><i>See also: </i><a href="#out_gradDisplacement">out_gradDisplacement</a>
+				,
+				<a href="#EulerLagrange">EulerLagrange</a>
+</ul>
+<br><br><b id="out_plasticStrain"> out_plasticStrain </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If out_plasticStrain=.true., the plastic strain defined on each atom
+				is printed in output structure file.
+				The plastic strain is obtained from the difference between
+				the total and the elastic strains.
+			</div>
+<br><i>See also: </i><a href="#out_strain">out_strain</a>
+				,
+				<a href="#out_elasticStrain">out_elasticStrain</a>
+</ul>
+<br><br><b id="out_nye"> out_nye </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If out_nye=.true., the Nye tensor defined on each atom 
+				is printed in output structure file.
+				The Nye tensor is obtained from the plastic strain 
+				by finite differences.
+			</div>
+<br><i>See also: </i><a href="#out_plasticStrain">out_plasticStrain</a>
+</ul>
+<br><br><b id="out_BurgersDensity"> out_BurgersDensity </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If out_burgersDensity=.true., the Burgers density defined on each atom 
+				is printed in output structure file.
+				The Burgers density is obtained by projection of the Nye tensor
+				using lNye and bNye for the directions of the dislocation lines
+				and of the Burgers vector.
+			</div>
+<br><i>See also: </i><a href="#out_nye">out_nye</a>
+				,
+				<a href="#bNye">bNye</a>
+				,
+				<a href="#lNye">lNye</a>
+</ul>
+<br><br><b id="out_neighbours"> out_neighbours </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If out_neighbours=.true., the number of neighbours 
+				is saved in output structure file for each atom.
+			</div>
+<br><i>See also: </i><a href="#outFile">outFile</a>
+</ul>
+<br><br><b id="out_pattern"> out_pattern </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false. ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				If out_pattern=.true., the output pattern 
+				is saved in output structure file for each atom.
+			</div>
+<br><i>See also: </i><a href="#outFile">outFile</a>
+</ul>
+<br><br><b id="verbosity"> verbosity </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  integer , 
+			<i>default</i>:  4 ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				Integer values defining amount of information on output unit.
+				verbosity=0: no output
+				verbosity=4: normal output
+				verbosity&gt;=10: debugging
+			</div>
+</ul>
+<br><br><b id="debug"> debug </b><a href="#input">
+			↑
+		</a><br><ul>
+			(<i>type</i>:  logical , 
+			<i>default</i>:  .false ,
+			<i>mandatory</i>:  no )
+			<div style="white-space: pre-line;">
+				For debug purpose.
+			</div>
+</ul>
+<br><br>
+</ul>
+<div style="text-align:right"><font size="2">
+						Back to 
+						<a href="./index.html">main page</a>,
+						<a href="./input_babel.html">babel</a>,
+						<a href="./input_displacement.html">displacement</a>,
+						<a href="./input_patternDetect.html">patternDetect</a>,
+						<a href="./input_prepareDrag.html">prepareDrag</a>,
+						<a href="./structures.html">structures</a></font></div>
+</BODY>
+</HTML>

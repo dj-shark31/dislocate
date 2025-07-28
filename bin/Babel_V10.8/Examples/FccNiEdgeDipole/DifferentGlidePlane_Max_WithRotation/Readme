@@ -1,0 +1,76 @@
+Les axes x, y et z utilisés correspondent aux direction [110], [-112] et [1-11],
+repère naturel par rapport à l'orientation de la dislocation du cristal cubique.
+Dans ce repère, les vecteurs de périodicité de la cellule élémentaire utilisée pour construire le cristal parfait de Ni sont:
+	a1 = sqrt(2.)/2. * ( 1. 0. 0. )  
+	a2 = sqrt(6.)/2. * ( 0. 1. 0. )
+	a3 = sqrt(3.)    * ( 0. 0. 1. )
+
+==============================
+
+Étape 0: 
+-------
+On effectue une rotation du repère cubique dans le repère de travail,
+en particulier pour récupérer le tenseur des constantes élastiques 
+et le motif élémentaire définissant le cristal parfait cfc
+dans ce repère de travail.
+
+commande à exécuter: babel input_rotate.babel dans le répertoire 0_Rotate
+
+
+Étape 1:
+-------
+On génère une boîte de simulation en dupliquant le motif élémentaire respectivement n, m et p fois 
+dans les directions de périodicité a1, a2, a3
+Ici, n=50, m=3 et p=20
+Le motif élémentaire est défini dans le fichier ni_fcc_elem_rotate.xyz. 
+Après duplication, le cristal parfait se trouve dans le fichier ni_fcc.xyz
+et contient 18000 atomes
+
+commande à exécuter: babel input_duplicate.babel dans le répertoire 1_Duplicate
+
+
+Étape 2:
+-------
+On introduit un dipôle de dislocation dans la grande boîte de cristal parfait
+en utilisant la théorie élastique anisotrope.
+Comme il s'agit d'un dipôle de dislocations coins, avec des dislocations qui ne 
+partagent pas le même plan de glissement pour éviter leur annihilation, ceci 
+nécessite d'enlever des atomes (processus de Volterra). Le programme ne sait 
+que enlever des atomes, cas d'un dipôle de dislocations de type lacunaire. 
+Il ne sait pas gérer un dipôle de type interstitiel pour lequel il faudrait ajouter
+des atomes.  Ceci n'est pas un problème car en condition aux limites
+périodiques on peut passer facilement de l'un à l'autre suivant l'image 
+considérée pour chaque dislocation (en pratique, on peut juste changer le signe
+des vecteurs de Burgers).
+Après introduction du dipôle, la boîte ne contient plus que 17820 atomes.
+
+Les dislocations ont pour vecteur ligne
+	(0. 1. 0.) vecteur colinéaire à a2
+pour vecteur de Burgers:
+	sqrt(2.)/2. * (1.  0.  0.) vecteur colinéaire à a1
+Leur plan de glissement est donc le plan défini par les vecteurs a1 et a2.
+Leurs positions sont les suivantes:
+x1 =    n/2. * sqrt(2.)/2.   ; z1 = (  p/4 + 0.5)*sqrt(3.)
+x2 =    n/2. * sqrt(2.)/2.   ; z2 = (3*p/4 + 0.5)*sqrt(3.)
+avec n=50 et p=20 dans cet exemple.
+Un petit bruit a été ajouté sur la position x des dislocations 
+car sinon les dislocations se trouvent en position trop symétrique
+par rapport aux atomes ce qui a pour conséquence d'avoir des atomes 
+se trouvant exactement sur la frontière du volume de matière devant 
+être enlevé au cours du processus de Volterrra, si bien qu'au final
+trop d'atomes sont enlevés.
+
+
+La position des dislocations n'est pas aléatoire. C'est celle qui minimise 
+l'énergie d'interaction entre dislocations. Ça correspond à un arrangement
+quadripolaire où chaque dislocation est équidistante de la seconde dislocation 
+composant le dipôle et des ses images périodiques.
+
+Attention, les vecteurs de périodicité après introduction du dipôle 
+de dislocations ne sont plus les mêmes que dans le cristal parfait, 
+à cause de la déformation plastique due à l'introduction du dipôle, 
+déformation qu'il faut accomoder pour ne pas avoir des contraintes 
+trop élevées dans la boîte de simulation.
+Dans ce cas, en particulier, ils restent néanmoins orthogonaux.
+
+commande à exécuter: babel input_dislo.babel dans le répertoire 2_Dislo

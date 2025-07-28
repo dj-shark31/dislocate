@@ -3,22 +3,14 @@
 Python version of get_pattern.sh: pattern detection for POSCAR files only.
 """
 import argparse
-import subprocess
 import os
 import tempfile
+import subprocess
+from analyze_core import abspath_from_script
 
 def escape_path(path):
     """Escape forward slashes in path for sed replacement"""
     return path.replace('/', '\\/')
-
-def run(cmd, **kwargs):
-    print('Running:', ' '.join(str(x) for x in cmd))
-    return subprocess.run(cmd, check=True, **kwargs)
-
-def abspath_from_script(rel_path):
-    """Return absolute path relative to the directory containing this script."""
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.abspath(os.path.join(script_dir, rel_path))
 
 def main():
     parser = argparse.ArgumentParser(description='Python version of get_pattern.sh')
@@ -28,7 +20,7 @@ def main():
     parser.add_argument('natom', type=int)
     parser.add_argument('tmp_pattern')
     parser.add_argument('--pattern_dat', default=abspath_from_script('pattern.dat'))
-    parser.add_argument('--patternDetect_bin', default='/global/home/users/djany/Babel_V10.8/bin/patternDetect')
+    parser.add_argument('--patternDetect_bin', default=abspath_from_script('../../bin/Babel_V10.8/bin/patternDetect'))
     args = parser.parse_args()
 
     # Determine nrep, duplicate, imm

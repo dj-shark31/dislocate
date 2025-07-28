@@ -33,7 +33,7 @@ def setup_lammpslib_calculator(potential_type, potential_path):
     calc = LAMMPSlib(lmpcmds=lmp_cmds)
     return calc
 
-def run_calculation(atoms, potential_type, potential_path):
+def get_energy_stress(atoms, potential_type, potential_path):
     """Run calculation using ASE LAMMPSlib or MACE calculator"""
     if potential_type in ["MEAM", "DMD", "RANN", "ACE"]:
         calc = setup_lammpslib_calculator(potential_type, potential_path)
@@ -68,7 +68,7 @@ def main():
 
     try:
         atoms = read(args.dis_cell, format='vasp')
-        stress, energy = run_calculation(atoms, args.potential_type, args.potential_path)
+        stress, energy = get_energy_stress(atoms, args.potential_type, args.potential_path)
         with open(args.tmp_energy_stress, 'w') as f:
             if stress is not None:
                 stress_str = ' '.join([f"{s:.6f}" for s in stress])

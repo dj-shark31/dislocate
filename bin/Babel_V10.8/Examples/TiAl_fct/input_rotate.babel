@@ -1,0 +1,39 @@
+&input
+  
+  rotate=.true.
+
+  rot(1,1)=-0.403126059774138
+  rot(1,2)=0.403126059774138
+  rot(1,3)=0.821570909819692
+
+  rot(2,1)=0.580938361559106
+  rot(2,2)=-0.580938361559106
+  rot(2,3)=0.570106341078612
+
+  rot(3,1)=0.707106781186547
+  rot(3,2)=0.707106781186547
+  rot(3,3)=0.
+
+  anisotropic_elasticity=.true.
+
+  CVoigt(1,1)=171.      ! GPa
+  CVoigt(2,2)=171.
+  CVoigt(3,3)=172.
+  CVoigt(1,2)=88.
+  CVoigt(2,1)=88.
+  CVoigt(1,3)=85.  
+  CVoigt(3,1)=85.  
+  CVoigt(2,3)=85.  
+  CVoigt(3,2)=85.  
+  CVoigt(4,4)=112.
+  CVoigt(5,5)=112.
+  CVoigt(6,6)=64. 
+
+  inpFile='tial_fct.xyz'
+  inpXyz=.true.
+  outFile='tial_fct_rotated.cfg'
+  outCfg=.true.
+  out_alat=3.999
+
+
+//

@@ -1,0 +1,64 @@
+&input
+
+  ! Définition des constantes élastiques dans le repère considéré (cubique ici)
+  cubic_elasticity=.true.
+  C11=249.	! GPa
+  C12=155.
+  C44=114.
+
+  ! Paramètre de maille utilisé pour la normalisation des distances dans ce fihcier
+  !    en particulier pour les paramètres suivant définissant le dipôle de dislocations: bDDipole, c1DDipole, c2DDipole	
+  alat=3.52	! Å
+
+  ! Définition de conditions aux limites périodiques pour la génération des dislocations
+  !   dans les directions des vecteurs a1 et a3
+  !   (pas suivant le vecteur a2 qui correspond au vecteur ligne des dislocations)
+  xImages=.TRUE.
+  yImages=.FALSE.
+  zImages=.TRUE.
+  !   nombre d'images périodiques à prendre en compte pour le calcul
+  nxImages=10	
+  nzImages=10
+ 
+  ! Définition d'un fichier où aller lire la structure d'origine
+  inpXyz=.true.		! Fichier écrit au format xyz (~ rasmol). On peu aussi utiliser inpCfg pour le format atomeye
+  inpFile='ni_fcc.xyz'	! Nom du fichier 
+
+  ! Définition du fichier où écrire la structure après les différentes opérations
+  outXyz=.true.		! Fichier écrit au format xyz (~ rasmol). On peu aussi utiliser outCfg pour le format atomeye
+  outFile='ni_dislo.xyz'	! Nom du fichier 
+
+
+  ! On enlève, dans la structure finale, les atomes se trouvant dans le plan de coupe 
+  !   créé par le dipôle de dislocations (processus de Volterra)
+  remove_cut=.true.
+
+//
+
+&DDipole
+  ! Définition d'un dipôle de dislocations
+
+  ! Nombre de dipôles de dislocations
+  nDDipole=1
+
+  ! Vecteur ligne des deux dislocations composant le dipôle
+  lDDipole(1,1)=-1.   	! sans unité
+  lDDipole(2,1)=1.   
+  lDDipole(3,1)=2.  
+
+  ! Vecteur de Burgers des deux dislocations
+  bDDipole(1,1)=-0.5   	! normalisé par alat
+  bDDipole(2,1)=-0.5   
+  bDDipole(3,1)=0.
+
+  ! Position de la première dislocation composant le dipôle
+  c1DDipole(1,1)=16.75	! normalisé par alat
+  c1DDipole(2,1)=-4.25
+  c1DDipole(3,1)=10.5
+
+  ! Position de la seconde dislocation composant le dipôle
+  c2DDipole(1,1)=29.25
+  c2DDipole(2,1)=8.25
+  c2DDipole(3,1)=10.5
+ 
+//

@@ -1,0 +1,32 @@
+
+printUsage() {
+	echo "Usage: $0 input_file output_file"
+	echo "  input file with xyz format"
+	echo "  output file with siesta format"
+	exit 1
+}
+
+if [ $# \< 2 ]; then
+	printUsage
+fi
+
+xyzFile=$1
+siestaFile=$2
+
+if [ ! -f $xyzFile ]; then
+	echo "file $xyzFile does not exist"
+	exit
+fi
+
+tmpFile=`mktemp`
+echo > $tmpFile "
+&input
+  verbosity=0
+  inpXyz=.true.
+  inpFile='$xyzFile'
+  outSiesta=.true.
+  outFile='$siestaFile'
+&end
+" 
+$babel $tmpFile
+rm -f $tmpFile

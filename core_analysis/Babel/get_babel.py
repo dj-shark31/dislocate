@@ -8,11 +8,7 @@ import argparse
 import os
 import subprocess
 import tempfile
-
-def abspath_from_script(rel_path):
-    """Return absolute path relative to the directory containing this script."""
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.abspath(os.path.join(script_dir, rel_path))
+from analyze_core import abspath_from_script
 
 def create_temp_file(prefix='babel-', suffix='', directory='tmp'):
     """Create a temporary file with the specified prefix and suffix"""
@@ -48,7 +44,7 @@ def main():
     parser.add_argument('tmp_babel', help='Temporary Babel output file')
     parser.add_argument('oxygen', type=int, choices=[0, 1], 
                        help='Oxygen flag (0=keep, 1=delete)')
-    parser.add_argument('--babel_path', default='/global/home/users/djany/Babel_V10.8/bin/displacement')
+    parser.add_argument('--babel_path', default=abspath_from_script('../../bin/Babel_V10.8/bin/displacement'))
     
     args = parser.parse_args()
     

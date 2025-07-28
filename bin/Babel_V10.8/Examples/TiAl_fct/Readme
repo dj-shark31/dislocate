@@ -1,0 +1,62 @@
+-------------------------------
+Step 1: rotation of the crystal
+------
+
+Tetragronal lattice with 
+c/a = 4.076/3.999 = 1.019
+
+We want to have in new reference frame:
+ - Burgers vector: b = 0.5 [ 1 1 0 ] along ez 
+ - glide direction: g = [-1 1 2 ] along ex 
+
+The corresponding rotation matrix is calculated in 'rotation.gnu' gnuplot script file
+command: gnuplot rotation.gnu
+
+The L10 structure and the corresponding elastic constants are rotated with 'input_rotate.babel' file
+command: babel input_rotate.babel | tee output_rotate.babel
+
+
+
+-------------------------------
+Step 2: replicate the crystal
+	n1 times along U1
+	n2 times along U2
+
+Dimensions of the periodicity cells: 
+l1 ~ 1.225a
+l2 ~ 1.732a
+To have an almost square simulation box, we should have n2 ~ 0.707 n1
+To have a quadrupolar arrangement with both dislocations in exactly the same 
+configuration, both n1 and n2 should be even
+If n1 is odd, one dislocation will be in-between a pair of Al atoms 
+and the other in a pair of Ti atoms.
+If n2 is odd, a shift by n2/2*U2 is not possible for the second dislocation
+
+	n1=6	n2=4	144 atoms
+	n1=8	n2=6	288 atoms	=> we choose these values
+
+
+-------------------------------
+Step 3: create the dislocation dipole
+
+* case 1: dislocations centered in-between two Al atoms
+Positions of the dislocations:
+	dislo1: 2 U1 + 3/2 U2
+	dislo2: 6 U1 + 9/2 U2
+Cartesian coordinates calculated with gnuplot script 'position_dislo1.gnu'
+command: gnuplot position_dislo1.gnu
+Dislocation dipole created with 'input_dilso1.babel' file
+command: babel input_dislo1.babel | tee output_dislo1.babel
+
+* case 2: dislocations centered in-between two Ti atoms
+Positions of the dislocations:
+	dislo1:  5/2 U1 + 3/2 U2
+	dislo2: 13/2 U1 + 9/2 U2
+Cartesian coordinates calculated with gnuplot script 'position_dislo2.gnu'
+command: gnuplot position_dislo2.gnu
+Dislocation dipole created with 'input_dilso2.babel' file
+command: babel input_dislo2.babel | tee output_dislo2.babel
+
+
+	
+

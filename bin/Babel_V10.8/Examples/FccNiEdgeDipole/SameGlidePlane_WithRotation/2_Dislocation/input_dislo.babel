@@ -1,0 +1,80 @@
+&input
+
+  ! Définition des constantes élastiques dans le repère de travail, i.e. après application de la rotation 
+  !   (à récupérer dans le fichier de sortie du répertoire 0_rotate)
+  anisotropic_elasticity=.true.
+  CVoigt(1,1)=316.00	! GPa
+  CVoigt(1,2)=132.67
+  CVoigt(1,3)=110.33
+  CVoigt(2,1)=132.67
+  CVoigt(2,2)=316.00
+  CVoigt(2,3)=110.33
+  CVoigt(3,1)=110.33
+  CVoigt(3,2)=110.33
+  CVoigt(3,3)=338.33
+  CVoigt(4,4)=69.333
+  CVoigt(5,5)=69.333
+  CVoigt(6,6)=91.667
+  CVoigt(1,4)=31.584
+  CVoigt(4,1)=31.584
+  CVoigt(2,4)=-31.584
+  CVoigt(4,2)=-31.584
+  CVoigt(5,6)=31.584
+  CVoigt(6,5)=31.584
+
+  ! Paramètre de maille utilisé pour la normalisation des distances dans ce fihcier
+  !    en particulier pour les paramètres suivant définissant le dipôle de dislocations: bDDipole, c1DDipole, c2DDipole	
+  alat=3.52	! Å
+
+  ! Définition de conditions aux limites périodiques pour la génération des dislocations
+  !   dans les directions des vecteurs a1 et a3
+  !   (pas suivant le vecteur a2 qui correspond au vecteur ligne des dislocations)
+  xImages=.TRUE.
+  yImages=.FALSE.
+  zImages=.TRUE.
+  !   nombre d'images périodiques à prendre en compte pour le calcul
+  nxImages=10	
+  nzImages=10
+ 
+  ! Définition d'un fichier où aller lire la structure d'origine
+  inpXyz=.true.		! Fichier écrit au format xyz (~ rasmol). On peu aussi utiliser inpCfg pour le format atomeye
+  inpFile='ni_fcc.xyz'	! Nom du fichier 
+
+  ! Définition du fichier où écrire la structure après les différentes opérations
+  outXyz=.true.		! Fichier écrit au format xyz (~ rasmol). On peu aussi utiliser outCfg pour le format atomeye
+  outFile='ni_dislo.xyz'	! Nom du fichier 
+
+
+  ! On enlève, dans la structure finale, les atomes se trouvant dans le plan de coupe 
+  !   créé par le dipôle de dislocations (processus de Volterra)
+  remove_cut=.true.
+
+//
+
+&DDipole
+  ! Définition d'un dipôle de dislocations
+
+  ! Nombre de dipôles de dislocations
+  nDDipole=1
+
+  ! Vecteur ligne des deux dislocations composant le dipôle
+  lDDipole(1,1)=0.   	! sans unité
+  lDDipole(2,1)=1.   
+  lDDipole(3,1)=0.  
+
+  ! Vecteur de Burgers des deux dislocations
+  bDDipole(1,1)=0.707106781187   	! normalisé par alat
+  bDDipole(2,1)=0.   
+  bDDipole(3,1)=0.
+
+  ! Position de la première dislocation composant le dipôle
+  c1DDipole(1,1)=8.83883476483184405500	! normalisé par alat
+  c1DDipole(2,1)=0.
+  c1DDipole(3,1)=18.18653347947321158196
+
+  ! Position de la seconde dislocation composant le dipôle
+  c2DDipole(1,1)=26.51650429449553216500
+  c2DDipole(2,1)=0.
+  c2DDipole(3,1)=18.18653347947321158196
+ 
+//

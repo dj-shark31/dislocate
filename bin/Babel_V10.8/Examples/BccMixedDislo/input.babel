@@ -1,0 +1,56 @@
+	&input
+
+	  anisotropic_elasticity=.true.
+
+          ! Elastic constants (in GPa)
+	  CVoigt(1,1)=266.00
+          CVoigt(1,2)=140.00
+          CVoigt(1,3)=134.00
+          CVoigt(1,5)=-8.4853
+          CVoigt(2,1)=140.00
+          CVoigt(2,2)=266.00
+          CVoigt(2,3)=134.00
+          CVoigt(2,5)=8.4853
+          CVoigt(3,1)=134.00
+          CVoigt(3,2)=134.00
+          CVoigt(3,3)=272.00
+          CVoigt(4,4)=57.000
+          CVoigt(4,6)=8.4853
+          CVoigt(5,1)=-8.4853
+          CVoigt(5,2)=8.4853
+          CVoigt(5,5)=57.000
+          CVoigt(6,4)=8.4853
+          CVoigt(6,6)=63.000
+
+          ! ! Noise to give to elastic constants to withdraw any isotropy
+          ! CVoigt_noise=1.d-4	! no unit 
+
+          ! Lattice parameter (in Å)
+	  alat=2.8803
+
+//
+
+&dislo
+	  ! Number of dislocations
+	  nd=1
+
+          ! Burgers vector (normalized by alat if defined)
+	  bDislo(1,1)=0.
+	  bDislo(2,1)=0.
+	  bDislo(3,1)=0.8660254037844386468
+
+          ! Line vector
+	  lDislo(1,1)=.017452406436
+	  lDislo(2,1)=0.
+	  lDislo(3,1)=.999847695156
+
+          ! Cut direction 
+	  cutDislo(1,1)=.999847695156
+	  cutDislo(2,1)=0.
+	  cutDislo(3,1)=-.017452406436
+  
+          ! Dislo position
+	  cDislo(1,1)=0.
+	  cDislo(2,1)=0.
+	  cDislo(3,1)=0.
+//

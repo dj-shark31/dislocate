@@ -1,0 +1,20 @@
+&input
+  
+  ! Maximum number of atoms after duplication
+  imm=20000
+
+  duplicate=.true.
+  lat(1)=20
+  lat(2)=24
+  lat(3)=10
+
+  !   input structure
+  inpXyz=.true.
+  inpFile="zr_hcp_rotated.xyz"
+
+  !   output structure
+  outXyz=.true.
+  outFile="zr_hcp_supercell.xyz"
+  out_alat=3.234	! Å
+
+//

@@ -1,0 +1,70 @@
+&input
+  
+  anisotropic_elasticity=.true.
+  CVoigt(1,1)=168.00
+  CVoigt(1,2)=76.000
+  CVoigt(1,3)=76.000
+  CVoigt(2,1)=76.000
+  CVoigt(2,2)=142.00
+  CVoigt(2,3)=75.000
+  CVoigt(3,1)=76.000
+  CVoigt(3,2)=75.000
+  CVoigt(3,3)=142.00
+  CVoigt(4,4)=33.500
+  CVoigt(5,5)=44.000
+  CVoigt(6,6)=44.000
+
+  CVoigt_noise=1.d-6
+
+  ! Lattice parameter used to normalize distances in this input file
+  alat=3.234	! Å
+
+
+ ! Periodic images along x and y
+ xImages=.true.
+ yImages=.true.
+ zImages=.false.
+ nxImages=1
+ nyImages=1
+
+  !   input structure
+  inpXyz=.true.
+  inpFile="zr_hcp_supercell.xyz"
+
+  !   output structure
+  outXyz=.true.
+  outFile="zr_dislo.xyz"
+  out_alat=3.234	! Å
+
+  fixGravity=.true.
+  
+//
+
+&DDipole
+
+  ! ----------------
+  ! Number of dislocation dipoles
+  nDDipole=1
+ 
+  ! ----------------
+  ! Definition of dipole 1
+  lDDipole(1,1)=0.	! Line direction
+  lDDipole(2,1)=0.
+  lDDipole(3,1)=1.
+
+  bDDipole(1,1)=0.	! Burgers vector
+  bDDipole(2,1)=0.
+  bDDipole(3,1)=1.
+
+  ! Position of dislo 1
+  c1DDipole(1,1)=16.3795
+  c1DDipole(2,1)=10.96965511460288952562
+  c1DDipole(3,1)=0.
+
+  ! Position of dislo 2
+  c2DDipole(1,1)=16.3795
+  c2DDipole(2,1)=31.75426480542941704786
+  c2DDipole(3,1)=0.
+
+//
+

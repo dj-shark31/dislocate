@@ -1,0 +1,32 @@
+&input
+
+  ! ----------------
+  ! The unit cell needs to be duplicated to plot a larger zone
+  duplicate=.true.
+  lat(1)=-5
+  lat(2)=-5
+  lat(3)=1
+
+  ! ----------------
+  ! Maximal number of atoms after duplication
+  !   (used to dimension arrays)
+  imm=10000
+
+  ! ----------------
+  ! Input structure (with dislocation)
+  inpXyz=.true.		! Xyz format for input file
+  inpFile='fe_dislo_relaxed.xyz'	! Input structure file
+
+
+  ! ----------------
+  ! Reference structure (perfect crystal)
+  refXyz=.true.		! Xyz format for input file
+  refFile='fe_bcc.xyz'	! Reference structure file
+
+
+  ! ----------------
+  ! Output structure
+  outXyz=.true.			! Xyz format for output file
+  outFile='fe_dislo_displacement.xyz'	! Output structure file
+  initial=.true.	! Atom positions correspond to reference structure
+//

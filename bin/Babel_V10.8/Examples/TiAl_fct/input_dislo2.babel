@@ -1,0 +1,65 @@
+&input
+
+  anisotropic_elasticity=.true.
+
+  CVoigt(1,1)=234.38
+  CVoigt(1,2)=29.606
+  CVoigt(1,3)=78.662
+  CVoigt(2,1)=29.606
+  CVoigt(2,2)=241.91
+  CVoigt(2,3)=71.838
+  CVoigt(3,1)=78.662
+  CVoigt(3,2)=71.838
+  CVoigt(3,3)=193.50
+
+  CVoigt(4,4)=64.414
+  CVoigt(5,5)=89.086
+  CVoigt(6,6)=56.606
+
+  CVoigt(1,6)=-25.729
+  CVoigt(2,6)=15.659
+  CVoigt(3,6)=9.1335
+  CVoigt(6,1)=-25.729
+  CVoigt(6,2)=15.659
+  CVoigt(6,3)=9.1335
+
+  CVoigt(4,5)=33.021
+  CVoigt(5,4)=33.021
+
+  CVoigt_noise=1.d-6
+
+  alat=3.999
+
+  xImages=.true.
+  yImages=.true.
+  nxImages=20
+  nyImages=20
+
+  inpFile='tial_fct_duplicated.cfg'
+  inpCfg=.true.
+  outFile='tial_fct_dislo2.cfg'
+  outCfg=.true.
+  out_alat=3.999
+
+//
+
+&DDipole
+
+  nDDipole=1
+
+  bDDipole(1,1)=0.
+  bDDipole(2,1)=0.
+  bDDipole(3,1)=0.7071067811865470
+
+  lDDipole(1,1)=0.
+  lDDipole(2,1)=0.
+  lDDipole(3,1)=1.
+
+  c1DDipole(1,1)=3.147159998538
+  c1DDipole(2,1)=2.61422262701598
+  c1DDipole(3,1)=0.
+
+  c2DDipole(1,1)=8.20117317873359
+  c2DDipole(2,1)=7.84266788104793
+  c2DDipole(3,1)=0.
+//

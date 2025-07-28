@@ -5,19 +5,8 @@ Runs the OVITO and fitting pipeline using Python subprocess calls.
 Accounts for the use of fitting_core.py and updated argument names.
 """
 import argparse
-import subprocess
-import os
 import sys
-
-def run(cmd, check=True):
-    print('Running:', ' '.join(str(x) for x in cmd))
-    result = subprocess.run(cmd, check=check)
-    return result
-
-def abspath_from_script(rel_path):
-    """Return absolute path relative to the directory containing this script."""
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.abspath(os.path.join(script_dir, rel_path))
+from analyze_core import run, abspath_from_script
 
 def main():
     parser = argparse.ArgumentParser(description='Python version of get_ovito.sh')
@@ -33,7 +22,7 @@ def main():
     parser.add_argument('--pbc', type=str, default='false')
     parser.add_argument('--config', default='S')
     parser.add_argument('--ovito_bin', default='ovitos')
-    parser.add_argument('--ovito_sif', default='/global/scratch/users/djany/ovito.sif')
+    parser.add_argument('--ovito_sif', default=abspath_from_script('../../bin/ovito.sif'))
     args = parser.parse_args()
 
     # Run ovito_elastStab.py

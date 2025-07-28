@@ -1,0 +1,12 @@
+&input
+
+  ! Crystal structure
+  crystal='bcc'
+
+  ! Lattice parameter
+  alat=2.85	! Å
+
+  ! Output file containing crystallographic pattern
+  patternFile='bcc.pattern'
+
+//

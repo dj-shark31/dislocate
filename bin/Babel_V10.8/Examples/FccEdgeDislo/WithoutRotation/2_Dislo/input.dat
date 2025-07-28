@@ -1,0 +1,64 @@
+&input
+
+  cubic_elasticity=.true.
+  C11=170	! Anisotropic elastic constants
+  C12=123	! GPa
+  C44=76.2
+
+  !C11=212.02	! Isotropic elastic constants
+  !C12=101.62	! GPa
+  !C44=55.2
+
+
+  ! Lattice parameter used to normalized distances
+  alat=3.615	! (Å)
+
+  ! Input structure file
+  inpXyz=.true.	! Xyz format for input file
+  inpFile='cu_fcc_duplicated.xyz'		! Input structure file
+
+  ! Output structure file
+  outXyz=.true.			! Xyz format for output file
+  outFile='cu_dislo.xyz'	! Output structure file
+  ! outCfg=.true.		! Cfg format for output file
+  ! outFile='cu_dislo.cfg'	! Output structure file
+  ! outOnlyRes=.true.		! Only data for output file
+  ! outFile='cu_dislo.res'	! Output structure file
+
+  out_displacement=.true.       ! Print atom displacement
+  !out_pressure=.true.           ! Print pressure
+  !out_VonMises=.true.           ! Print Von-Misès equivalent shear stress
+  out_stress=.true.
+
+  ! Used atom positions read in input file for output
+  ! initial=.true.
+  ! Used atom positions obtained after applying dislo displacement for output
+  initial=.false.
+
+//
+
+&dislo
+
+  nd=1		! 1 dislocation
+
+  ! Dislo line vector
+  lDislo(1,1)=-1.
+  lDislo(2,1)=1.   
+  lDislo(3,1)=2.  
+
+  ! Dislo Burgers vector (normalized by alat)
+  bDislo(1,1)=-0.5
+  bDislo(2,1)=-0.5
+  bDislo(3,1)=0.
+
+  ! Direction of dislocation cut 
+  cutDislo(1,1)=-1
+  cutDislo(2,1)=-1
+  cutDislo(3,1)=0.
+  
+  ! Dislocation center (normalized by alat)
+  cDislo(1,1)=6.625
+  cDislo(2,1)=-2.375
+  cDislo(3,1)=4.5
+
+//

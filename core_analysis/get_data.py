@@ -5,17 +5,8 @@ Assumes both ref_cell and dis_cell are POSCAR files only.
 """
 import argparse
 import os
-import subprocess
 import tempfile
-
-def run(cmd, **kwargs):
-    print('Running:', ' '.join(str(x) for x in cmd))
-    return subprocess.run(cmd, check=True, **kwargs)
-
-def abspath_from_script(rel_path):
-    """Return absolute path relative to the directory containing this script."""
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.abspath(os.path.join(script_dir, rel_path))
+from analyze_core import run, abspath_from_script
 
 def main():
     parser = argparse.ArgumentParser(description='Orchestrate workflow for a single dislocation configuration (POSCAR-only, keyword arguments)')

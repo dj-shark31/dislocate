@@ -1,0 +1,27 @@
+With rotation (recommended)
+===========================
+
+1) Generate perfect crystal with good orientation
+corresponding to dislocation orientation
+	x // [110]
+	z // [-112]
+	y // [1-11]
+and also rotate elastic constants
+
+In directory 1_Dislo:
+	babel input.dat
+
+2) Generate dislocation
+In directory 2_Dislo: 
+	babel input.dat
+
+
+Without rotation (for fun)
+=========================
+1) Generate perfect crystal keeping cubic axes
+In directory 1_Dislo:
+	babel input.dat
+
+2) Generate dislocation
+In directory 2_Dislo: 
+	babel input.dat

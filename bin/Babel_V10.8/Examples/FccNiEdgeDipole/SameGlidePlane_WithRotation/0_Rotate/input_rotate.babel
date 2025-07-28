@@ -1,0 +1,35 @@
+&input
+  
+  ! Rotation à effectuer
+  rotate=.true.
+  rot(1,1)=0.7071067811865475244
+  rot(1,2)=0.7071067811865475244
+  rot(1,3)=0
+
+  rot(2,1)=-0.4082482904638630164
+  rot(2,2)=0.4082482904638630164
+  rot(2,3)=0.8164965809277260327
+
+  rot(3,1)=0.5773502691896257645
+  rot(3,2)=-0.5773502691896257645
+  rot(3,3)=0.5773502691896257645
+
+  ! Définition des constantes élastiques dans le repère d'origine, i.e. cubique
+  cubic_elasticity=.true.
+  C11=249.	! GPa
+  C12=155.
+  C44=114.
+
+
+  ! Définition d'un fichier où aller lire la structure d'origine
+  inpXyz=.true.		! Fichier écrit au format xyz (~ rasmol). On peu aussi utiliser inpCfg pour le format atomeye
+  inpFile='ni_fcc_elem.xyz'	! Nom du fichier 
+
+  ! Définition du fichier où écrire la structure après les différentes opérations
+  outXyz=.true.		! Fichier écrit au format xyz (~ rasmol). On peu aussi utiliser outCfg pour le format atomeye
+  outFile='ni_fcc_elem_rotate.xyz'	! Nom du fichier 
+
+  ! Normalisation par le paramètre de maille dans le fichier de sortie (optionel)
+  out_alat=3.52	! Å (valeur par défaut: out_alat=1.)
+
+//

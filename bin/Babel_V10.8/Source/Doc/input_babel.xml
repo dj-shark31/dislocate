@@ -1,0 +1,1090 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="input_xx.xsl" type="text/xsl"?>
+<manual>
+	<title>
+		Program babel
+	</title>
+	<intro> 
+		This program creates atomistic structure files containing line defects
+		using anisotropic elasticity with and without periodic boundary conditions. 
+		The displacement, strain, stress fields ... predicted by elasticity on each atomic positions
+		can be printed on output.
+		It can also calculate the elastic energy contained in the simulation box. 
+		Line defects can be infinite dislocations or dislocation dipoles, 
+		as well as dislocation loops (not fully implemented).
+	
+
+		Execution:
+		=========
+		babel input.dat
+		where input.dat is the input file
+		If input.dat="-", the input is read from current unit (keyboard or piped other command like echo)
+
+
+		Structure of the input file:
+		===========================
+
+		The input file can contain the namelist Input, Dislo, DDipole, Loops. 
+		Only the namelist Input is mandatory.
+
+		&amp;Input
+		  ...
+		//
+
+		&amp;Dislo
+		  ...
+		//
+
+		&amp;DDipole
+		  ...
+		//
+
+		&amp;Loops
+		  ...
+		//
+
+	</intro>
+	<namelist name="Input">
+		<name> Input </name>
+
+		<var name="anisotropic_elasticity">
+			<name> anisotropic_elasticity </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If anisotropic_elasticity=.true., the elastic constants are given 
+				for a crystal of any symmetry. 
+				You need to define all non null elements of the 6x6 matrix
+				corresponding to elastic constants in Voigt notation.
+			</info>
+			<see_also> <ilink>CVoigt</ilink> </see_also>
+			<see_also> <ilink>cubic_elasticity</ilink> </see_also>
+			<see_also> <ilink>hexagonal_elasticity</ilink> </see_also>
+		</var>
+		<var name="CVoigt">
+			<name> CVoigt </name>
+			<type> real, dim(6,6) </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				6x6 matrix defining the elastic constants in Voigt notation
+				when anisotropic_elasticity=.true.. 
+				All non null elements need to be given.
+				By defaults, the program assumes that the elastic constants are in GPa.
+			</info>
+			<see_also> <ilink>anisotropic_elasticity</ilink> </see_also>
+			<see_also> <ilink>CVoigt_noise</ilink> </see_also>
+		</var>
+		<var name="cubic_elasticity">
+			<name> cubic_elasticity </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If cubic_elasticity=.true., the elastic constants are given 
+				for a crystal of cubic symmetry. 
+				You need then to give the three constants C11, C12, and C44.
+				Make sure the crystal is oriented in the cubic axes corresponding to the elastic constants,
+				or use anisotropic_elasticity=.true. otherwise.
+			</info>
+			<see_also> <ilink>C11, C12, C44, C13, C33</ilink> </see_also>
+			<see_also> <ilink>anisotropic_elasticity</ilink> </see_also>
+			<see_also> <ilink>hexagonal_elasticity</ilink> </see_also>
+		</var>
+		<var name="hexagonal_elasticity">
+			<name> hexagonal_elasticity </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If hexagonal_elasticity=.true., the elastic constants are given 
+				for a crystal of hexagonal symmetry. 
+				You need then to give the five constants C11, C12, C44, C13 and C33.
+				Make sure the crystal is oriented so that the z coordinate corresponds
+  				to the 6-fold symmetry axis, or use anisotropic_elasticity=.true. otherwise.
+			</info>
+			<see_also> <ilink>C11, C12, C44, C13, C33</ilink> </see_also>
+			<see_also> <ilink>anisotropic_elasticity</ilink> </see_also>
+			<see_also> <ilink>cubic_elasticity</ilink> </see_also>
+		</var>
+		<var name="C11, C12, C44, C13, C33">
+			<name> C11, C12, C44, C13, C33 </name>
+			<type> real </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Elastic constants used for the special cases:
+					- cubic_elasticity=.true.: C11, C12, C44 are used
+					- hexagonal_elasticity=.true.: C11, C12, C44, C13 and C33 are used and C66=(C11-C12)/2
+				By defaults, the program assumes that the elastic constants are in GPa.
+			</info>
+			<see_also> <ilink>cubic_elasticity</ilink> </see_also>
+			<see_also> <ilink>hexagonal_elasticity</ilink> </see_also>
+		</var>
+		<var name="CVoigt_noise">
+			<name> CVoigt_noise </name>
+			<type> real </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				CVoigt_noise=x will add a random noise of maximal amplitude x to all elastic constants,
+				keeping the elastic matrix positive definite.  This is the relative amplitude 
+				and the absolute amplitude is obtained by multiplying with the norm of the elastic tensor.
+				This may be necessary for creating line defects when the crystal possesses some symmetries,
+				because of the Stroh formalism leading to undefined solutions in that cases. 
+				CVoigt_noise=1.d-4 will generally solve the problem without perturbing the solution.
+				Do not use a noise smaller than 1.d-6. 
+				When adding a noise, you should check that the result (the elastic energy or the Stroh matrix for instance)
+				does not depend too much on this noise by running several times the same calculation.
+			</info>
+		</var>
+		<var name="strain">
+			<name> strain </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Set the variable strain to .true. if you want to apply 
+				a homogeneous strain to the crystal in addition to the strain
+				created by the line defects.
+				The homogeneous strain to apply is defined either by epsi and eStrain
+				or by tau and sStrain.
+			</info>
+			<see_also> <ilink> eStrain </ilink> </see_also>
+			<see_also> <ilink> epsi </ilink> </see_also>
+			<see_also> <ilink> tau </ilink> </see_also>
+			<see_also> <ilink> sStrain </ilink> </see_also>
+			<see_also> <ilink> induced_homogeneous_strain </ilink> </see_also>
+		</var>
+		<var name="eStrain">
+			<name> eStrain </name>
+			<type> real, dim(3,3) </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Tensor defining the homogeneous strain to apply when strain=.true.
+				The applied strain is the product of this tensor with the scalar epsi.
+			</info>
+			<see_also> <ilink> strain </ilink> </see_also>
+			<see_also> <ilink> epsi </ilink> </see_also>
+		</var>
+		<var name="epsi">
+			<name> epsi </name>
+			<type> real </type>
+			<default> 1. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Scalar defining the homogeneous strain to apply when strain=.true.
+				The applied strain is the product of this scalar with the tensor eStrain(1:3,1:3).
+			</info>
+			<see_also> <ilink> strain </ilink> </see_also>
+			<see_also> <ilink> eStrain </ilink> </see_also>
+		</var>
+		<var name="sStrain">
+			<name> sStrain </name>
+			<type> real, dim(3,3) </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Stress tensor used to define the homogeneous strain to apply when strain=.true.
+				The applied strain is the product of the inverse elastic constants tensor 
+			        with this stress tensor multiplied the scalar tau.
+			</info>
+			<see_also> <ilink> strain </ilink> </see_also>
+			<see_also> <ilink> tau </ilink> </see_also>
+		</var>
+		<var name="tau">
+			<name> tau </name>
+			<type> real </type>
+			<default> 1. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Scalar used to define, with the stress tensor sStrain(1:3,1:3),
+				the homogeneous strain to apply when strain=.true.
+				The applied strain is the product of the inverse elastic constants tensor 
+			        with the stress tensor multiplied this scalar.
+				This needs to be given in the same units as the elastic constants (GPa).
+			</info>
+			<see_also> <ilink> strain </ilink> </see_also>
+			<see_also> <ilink> sStrain </ilink> </see_also>
+		</var>
+		<var name="induced_homogeneous_strain">
+			<name> induced_homogeneous_strain </name>
+			<type> logical </type>
+			<default> .true. </default>
+			<mandatory> no </mandatory>
+			<info>
+				When induced_homogeneous_strain=.true. , the homogeneous strain 
+				induced by the line defects is applied to the crystal 
+				so as to minimize the elastic energy existing in the simulation box.
+				For a dislocation dipole or a dislocation loop, this strain 
+				corresponds to the plastic strain introduced in the crystal 
+				when creating the dipole or the loop.
+			</info>
+			<see_also> <ilink> strain </ilink> </see_also>
+		</var>
+		<var name="imm">
+			<name>	imm </name>
+			<type> integer </type>
+			<default> 0 </default>
+			<mandatory> no </mandatory>
+			<info>
+				Maximal number of atom in the structure.
+				imm needs to be defined if the input structure is duplicated 
+				to dimension the arrays. 
+				Otherwise, the actual number of atoms, read from input structure file, is used.
+			</info>
+			<see_also> <ilink> duplicate </ilink> </see_also>
+		</var>
+		<var name="duplicate">
+			<name> duplicate </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If duplicate=.true., the crystal is duplicated.
+				lat(1:3) is the number of times the crystal should be duplicated
+				in each direction given by the vectors at(1:3,i) read in the structure file.
+				If lat(i) is negative, then the opposite of the vector at(1:3,i) is used.
+				The maximal number of atoms in the duplicated structure needs to be set with imm
+				and the periodicity vectors have to be defined.
+
+				When the structure is also rotated, the duplication is done first and then the rotation.
+				The periodicity vectors used for duplication are thus those before rotation.
+			</info>
+			<see_also> <ilink> imm </ilink> </see_also>
+			<see_also> <ilink> lat </ilink> </see_also>
+		</var>
+		<var name="lat">
+			<name>	lat </name>
+			<type> integer, dim(3) </type>
+			<default> 1 </default>
+			<mandatory> no  </mandatory>
+			<info>
+				Number of replicas in each direction when duplicating the structure files.
+			</info>
+			<see_also> <ilink> duplicate </ilink> </see_also>
+		</var>
+		<var name="rotate">
+			<name> rotate </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If rotate=.true., the crystal is rotated using rotation matrix defined in rot(1:3,1:3).
+				The program also rotates the definition of the line-defect and the elastic constants.
+
+				If both rotation and translation are performed, the crystal is first rotated
+				and then translated.
+			</info>
+			<see_also> <ilink> rot </ilink> </see_also>
+		</var>
+		<var name="rot">
+			<name> rot </name>
+			<type> real, dim(3,3) </type>
+			<default> identity matrix </default>
+			<mandatory> no </mandatory>
+			<info>
+				Rotation matrix used when rotate=.true.
+			</info>
+			<see_also> <ilink> rotate </ilink> </see_also>
+		</var>
+		<var name="symmetrize">
+			<name> symmetrize </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If symmetrize=.true., the atomic positions are symmetrized according to 
+				symmetry operations defined in file symFile.
+			</info>
+			<see_also> <ilink> symFile </ilink> </see_also>
+		</var>
+		<var name="symFile">
+			<name> symFile </name>
+			<type> string </type>
+			<default> '' </default>
+			<mandatory> yes/no </mandatory>
+			<info>
+				Xml file containing definition of the symmetry operations 
+				used to symmetrize the structure.
+			</info>
+			<see_also> <ilink> symmetrize </ilink> </see_also>
+		</var>
+		<var name="translate">
+			<name> translate </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If translate=.true., the crystal is translated with the vector uTranslate(1:3)
+				The program also translates the points definig the line-defect centers.
+
+				If both rotation and translation are performed, the crystal is first rotated
+				and then translated.
+			</info>
+			<see_also> <ilink> uTranslate </ilink> </see_also>
+		</var>
+		<var name="uTranslate">
+			<name> uTranslate </name>
+			<type> real, dim(3) </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Translation vector used when translate=.true.
+				If alat is defined, uTranslate(1:3) is multiplied by alat.
+			</info>
+			<see_also> <ilink> translate </ilink> </see_also>
+			<see_also> <ilink> alat </ilink> </see_also>
+		</var>
+		<var name="fixGravity">
+			<name> fixGravity </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				When fixGravity=.true., a solid displacement is added to atom final positions
+			       	and displacements to keep fixed gravity center
+			</info>
+		</var>
+		<var name="xNoise">
+			<name> xNoise </name>
+			<type> real </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If positive, add to atomic positions of the output structure
+			       	a noise which amplitude is equal to xNoise multiplied by alat.
+				The gravity center is kept fixed.
+			</info>
+			<see_also> <ilink> alat </ilink> </see_also>
+		</var>
+		<var name="alat">
+			<name> alat </name>
+			<type> real </type>
+			<default> 1. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Length used to scale all distances in the present input file (uTranslate, rc, ...),
+				including the line defect definitions in other namelists (cDiso, bDislo, ...).
+				It is also used to scale xNoise.
+				It has no effect on the atomic configuration read in input structure file.
+			</info>
+		</var>
+		<var name="xImages, yImages, zImages">
+			<name> xImages, yImages, zImages </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If xImages=.true. (yImages or zImages), periodic boundary conditions
+				are assumed in the corresponding direction and periodic images are considered
+				for all defined line-defects. The number of periodic images considered 
+				in each direction is controlled by nxImages (nyImages or nzImages).
+			</info>
+			<see_also> <ilink>nxImages, nyImages, nzImages</ilink> </see_also>
+		</var>
+		<var name="nxImages, nyImages, nzImages">
+			<name> nxImages, nyImages, nzImages </name>
+			<type> integer </type>
+			<default> 10 </default>
+			<mandatory> no </mandatory>
+			<info>
+				Number of images to consider in each direction with periodic boundary conditions.
+				The default value is large enough to build an initial configuration 
+				but should be increased for energy calculation. 
+				For a small unit-cell like the ones used in ab-initio calculation,
+				you probably need to increase this value to 100.
+				A way to check convergence is to run several simulations. As the point where periodicity is enforced
+				is randomly chosen, different simulations will lead to different results for elastic energy. 
+				Nevertheless, differences should be small (less than 0.1 meV) and correspond to calculation convergence.
+			</info>
+			<see_also> <ilink>xImages, yImages, zImages</ilink> </see_also>
+		</var>
+		<var name="clipAtom">
+			<name> clipAtom </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If clipAtom=.true., periodic boundary conditions are applied
+			       	to atom coordinates to bring them back in the primitive unit cell.
+				The periodicity vectors have to be defined.
+			</info>
+		</var>
+		<var name="clipDisplacement">
+			<name> clipDisplacement </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If clipDisplacement=.true., periodic boundary conditions are applied
+				to atom displacements.
+				The periodicity vectors have to be defined.
+			</info>
+		</var>
+		<var name="remove_cut">
+			<name> remove_cut </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If remove_cut=.true. (or add_cut=.true.), atoms located inside the cut associated
+				with the creation of a single dislocation or a dislocation dipole are removed 
+				or inserted (Volterra process). 
+				This also works with dislocation loops.
+			</info>
+			<see_also> <ilink>Dislo</ilink> </see_also>
+			<see_also> <ilink>DDipole</ilink> </see_also>
+			<see_also> <ilink>Loops</ilink> </see_also>
+		</var>
+		<var name="add_cut">
+			<name> add_cut </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Same control parameter as remove_cut
+			</info>
+			<see_also> <ilink>remove_cut</ilink> </see_also>
+		</var>
+		<var name="max_Euler">
+			<name> max_Euler </name>
+			<type> integer </type>
+			<default> 0 </default>
+			<mandatory> no </mandatory>
+			<info>
+				EXPERIMENTAL: Eulerian or Lagrangian coordinates can be used.
+				In Lagrangian coordinates, elastic fields (displacement, stress) are calculated at point x0
+				corresponding to the initial coordinates.
+				In Eulerian coordinates, fields are calculated at point x = x0 + u(x),
+				where u(x) is the displacement calculated at the final point.
+				A self-consistency loop is used for Eulerian coordinates, with a maximal number of iterations
+				given by max_Euler. 
+				Default value max_Euler=0 corresponds to Lagrangian coordinates and should be preferred.
+			</info>
+			<see_also> <ilink>delta_Euler</ilink> </see_also>
+		</var>
+		<var name="delta_Euler">
+			<name> delta_Euler </name>
+			<type> real </type>
+			<default> 1.d-5 </default>
+			<mandatory> no </mandatory>
+			<info>
+				When Eulerian coordinates are used, delta_Euler controls the absolute convergence
+				of the displacement. The self-consistency loop will stop when u(x) is smaller than (x-x0)
+			       	(in absolute value).
+			</info>
+			<see_also> <ilink>max_Euler</ilink> </see_also>
+		</var>
+		<var name="rc">
+			<name> rc </name>
+			<type> real </type>
+			<default> 1. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Cutoff radius corresponding to the core of the line defects.
+				This is useful for energy calculations and to define atoms inside the core (see out_core).
+				If alat is defined, rc is multiplied by alat.
+			</info>
+			<see_also> <ilink>out_core</ilink> </see_also>
+			<see_also> <ilink>alat</ilink> </see_also>
+		</var>
+		<var name="factorE">
+			<name> factorE </name>
+			<type> real </type>
+			<default> 0.00624150947961 </default>
+			<mandatory> no </mandatory>
+			<info>
+				Conversion factor to transform stress * volume in energy.
+				The default value assumes that elastic constants are in GPa
+				and distances in Angstroms, so as to obtain energies in eV. 
+				This is used to calculate elastic energy and with out_Ebinding 
+				to calculate impurity binding energies
+			</info>
+			<see_also> <ilink>out_Ebinding</ilink> </see_also>
+		</var>
+		<var name="inpFile">
+			<name>	inpFile </name>
+			<type> character string </type>
+			<default> '-' </default>
+			<mandatory> yes/no </mandatory>
+			<info>
+				Name of the structure file used as input.
+				If input='-', the structure is read from keyboard.
+				The file formats are defined by inpXyz | inpCfg | inpGin | inpSiesta | inpNDM | inpLammps | inpPoscar
+			</info>
+			<see_also> <ilink>inpXyz, inpCfg, inpGin, inpSiesta, inpNDM, inpLammps, inpPoscar</ilink> </see_also>
+		</var>
+		<var name="inpXyz, inpCfg, inpGin, inpSiesta, inpNDM, inpLammps, inpPoscar">
+			<name>	inpXyz, inpCfg, inpGin, inpSiesta, inpNDM, inpLammps, inpPoscar  </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> one should be set to .true. </mandatory>
+			<info>
+				If inpXyz=.true. the input structure file 
+				is given in xyz format.
+			</info>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+			<see_also> <ilink>inpFile</ilink> </see_also>
+		</var>
+		<var name="nTypes">
+			<name> nTypes </name>
+			<type> integer </type>
+			<default> 0 </default>
+			<mandatory> no </mandatory>
+			<info>
+				Number of different atom types. This is necessary only if you want to define 
+				the label(:) property for each atom and this cannot be obtained from the 
+				input structure file. Otherwise, the number of different atom types 
+				should be set automatically after reading the input structure file.
+			</info>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+			<see_also> <ilink>label</ilink> </see_also>
+		</var>
+		<var name="label">
+			<name> label </name>
+			<type> character(len=5), dim(360) </type>
+			<default> (/ A, B, ... /) </default>
+			<mandatory> no  </mandatory>
+			<info>
+				Label corresponding to each atom type if necessary and it cannot be obtained 
+				from the input structure file.
+			</info>
+			<see_also> <ilink>nTypes</ilink> </see_also>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+		</var>
+		<var name="mass">
+			<name> mass </name>
+			<type> real, dim(360) </type>
+			<default> 0. </default>
+			<mandatory> no  </mandatory>
+			<info>
+				Mass corresponding to each atom type if necessary and it cannot be obtained 
+				from the input structure file.
+			</info>
+			<see_also> <ilink>nTypes</ilink> </see_also>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+		</var>
+		<var name="at">
+			<name> at </name>
+			<type> real, dim(3,3) </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				at(1:3,1), at(1:3,2), at(1:3,3): 3 periodicity vectors
+				The program tries first to read them in the input file and then 
+				in the structure file. If vectors are defined in both files, 
+				the ones defined in the structure file will be used.
+				If alat is defined, at(1:3,1:3) is multiplied by alat.
+			</info>
+			<see_also> <ilink>inpFile</ilink> </see_also>
+			<see_also> <ilink> alat </ilink> </see_also>
+		</var>
+		<var name="displacementFile">
+			<name> displacementFile </name>
+			<type> character string </type>
+			<default> '' </default>
+			<mandatory> no </mandatory>
+			<info>
+				If it is defined, a displacement vector is read in this file
+				for each atom and is added to atom position.
+				The displacement can be multiplied by displacementFileFactor.
+				The format of this file is xyz, as generated by programs babel or displacement.
+				The displacement vector should be in columns 5-7, just after atom positions.
+			</info>
+			<see_also> <ilink>displacementFileFactor</ilink> </see_also>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+		</var>
+		<var name="displacementFileFactor">
+			<name> displacementFileFactor </name>
+			<type> real </type>
+			<default> 1. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Factor to multiply displacement read in file displacementFile
+				before adding it to atom positions.
+			</info>
+			<see_also> <ilink>displacementFile</ilink> </see_also>
+		</var>
+		<var name="outFile">
+			<name> outFile </name>
+			<type> character string </type>
+			<default> '-' </default>
+			<mandatory> no </mandatory>
+			<info>
+				Name of the structure file where to save the output structure
+				which auxiliary properties set for each atom (displacement, stress, ...)
+				If outFile="-", the output file is printed on screen.
+				The file format is defined by outXyz | outCfg  | outOnlyAtoms ...
+			</info>
+			<see_also> <ilink>outXyz, outCfg, outOnlyAtoms, outGin, outSiesta, outLammps, outPoscar</ilink> </see_also>
+			<see_also> <ilink>initial</ilink> </see_also>
+			<see_also> <ilink>out_alat</ilink> </see_also>
+		</var>
+		<var name="outXyz, outCfg, outOnlyAtoms, outGin, outSiesta, outLammps, outPoscar">
+			<name> outXyz, outCfg, outOnlyAtoms, outGin, outSiesta, outLammps, outPoscar </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Format of the structure file used for output.
+			</info>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+			<see_also> <ilink> outFile </ilink> </see_also>
+		</var>
+		<var name="initial">
+			<name> initial </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If initial=.true., the coordinates of the input structure, 
+				i.e. before creation of the line defects, are used on output.
+			</info>
+			<see_also> <ilink> outFile </ilink> </see_also>
+		</var>
+		<var name="out_alat">
+			<name> out_alat </name>
+			<type> real </type>
+			<default> 1. </default>
+			<mandatory> no </mandatory>
+			<info>
+				When the output structure is written with xyz or cfg file format,
+				atomic positions and periodicity vectors can be scaled by a lattice parameter
+				given in out_alat.
+			</info>
+			<see_also> <ilink> outFile </ilink> </see_also>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+		</var>
+		<var name="out_neighbours">
+			<name> out_neighbours </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Print in output structure file the number of neighbours for each atom. 
+				The neighbourhood sphere is defined by the radius rNeigh.
+			</info>
+			<see_also> <ilink>outFile</ilink> </see_also>
+			<see_also> <ilink>rNeigh</ilink> </see_also>
+			<see_also> <ilink>max_nNeigh</ilink> </see_also>
+		</var>
+		<var name="rNeigh">
+			<name> rNeigh </name>
+			<type> real </type>
+			<default> -1 </default>
+			<mandatory> yes if out_neighbours=.true. </mandatory>
+			<info>
+				Radius of the neighbourhood sphere used to look for atom neighbours.
+				If alat is defined, rNeigh is multiplied by alat.
+			</info>
+			<see_also> <ilink>out_neighbours</ilink> </see_also>
+			<see_also> <ilink>alat</ilink> </see_also>
+		</var>
+		<var name="max_nNeigh">
+			<name> max_nNeigh </name>
+			<type> integer </type>
+			<default> 16 </default>
+			<mandatory> no </mandatory>
+			<info>
+				Maximal number of neighbours for an atom. 
+				This is used to dimension arrays when atom neighbourhoods are computed (out_neigbours=.true.).
+			</info>
+			<see_also> <ilink>out_neighbours</ilink> </see_also>
+		</var>
+		<var name="out_id">
+			<name> out_neighbours </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Print in output structure file the atom id.
+			</info>
+			<see_also> <ilink>outFile</ilink> </see_also>
+		</var>
+		<var name="out_displacement">
+			<name> out_displacement </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If out_displacement=.true., the displacement defined on each atom
+				is printed in output structure file.
+			</info>
+			<see_also> <ilink>outFile</ilink> </see_also>
+		</var>
+		<var name="out_elasticStrain">
+			<name> out_elasticStrain </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If out_elsaticStrain=.true., the elastic strain calculated on each atomic position
+				is printed in output structure file.
+			</info>
+			<see_also> <ilink>outFile</ilink> </see_also>
+		</var>
+		<var name="out_stress">
+			<name> out_stress </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If out_stress=.true., the stress tensor calculated on each atomic position
+				is printed in output structure file.
+			</info>
+			<see_also> <ilink>outFile</ilink> </see_also>
+		</var>
+		<var name="out_pressure">
+			<name> out_pressure </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If out_pressure=.true., the pressure calculated on each atomic position
+				is printed in output structure file.
+				P = -1/3 Trace( stress )
+			</info>
+			<see_also> <ilink>outFile</ilink> </see_also>
+			<see_also> <ilink>out_stress</ilink> </see_also>
+		</var>
+		<var name="out_VonMises">
+			<name> out_VonMises </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If out_VonMises=.true., the Von-Misès equivalent shear stress calculated on each atomic position
+				is printed in output structure file.
+				P = -1/3 Trace( stress )
+				sVM = Sqrt( 3/2*( ( s11 + P )^2 + ( s22 + P )^2 + ( s33 + P )^2 + 2.d0*( s23^2 + s13^2 + s12^2 ) ) )
+			</info>
+			<see_also> <ilink>outFile</ilink> </see_also>
+			<see_also> <ilink>out_stress</ilink> </see_also>
+		</var>
+		<var name="out_core">
+			<name> out_core </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If out_core=.true., print index 1 for atom belonging to defect core,
+			       	i.e. closer than rc from a line defect.
+			</info>
+			<see_also> <ilink>outFile</ilink> </see_also>
+			<see_also> <ilink>rc</ilink> </see_also>
+		</var>
+		<var name="out_Ebinding">
+			<name> out_Ebinding </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If out_Ebinding=.true., the binding energy with the elastic stress field
+				and an impurity is calculated and printed on each atomic positions.
+				The elastic dipole characterizing the impurity, pImpurity(:,:), needs to be defined. (~ Eshelby inclusion eigenstrain)
+			</info>
+			<see_also> <ilink>outFile</ilink> </see_also>
+			<see_also> <ilink>pImpurity</ilink> </see_also>
+		</var>
+		<var name="pImpurity">
+			<name> pImpurity </name>
+			<type> real, dim(3,3) </type>
+			<default> 0. </default>
+			<mandatory> yes, if out_Ebinding=.true. </mandatory>
+			<info>
+				Elastic dipole characterizing the impurity for binding energy calculation.
+			        This is equivalent to the eigenstrain for an Eshelby infinitesimal inclusion.
+				It should be given in the same units as the output energies (eV by default).
+			</info>
+			<see_also> <ilink>out_Ebinding</ilink> </see_also>
+		</var>
+		<var name="out_x, out_y, out_z">
+			<name> out_x, out_y, out_z </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If out_x=.true., print first atomic coordinates as auxiliary properties.
+				(not really useful)
+			</info>
+			<see_also> <ilink>outFile</ilink> </see_also>
+		</var>
+		<var name="verbosity">
+			<name> verbosity </name>
+			<type> integer </type>
+			<default> 4 </default>
+			<mandatory> no </mandatory>
+			<info>
+				Integer values defining amount of information on output unit.
+				verbosity=0: no output
+				verbosity=4: normal output
+				verbosity>=10: debugging
+			</info>
+		</var>
+		<var name="debug">
+			<name> debug </name>
+			<type> logical </type>
+			<default> .false </default>
+			<mandatory> no </mandatory>
+			<info>
+				For debug purpose.
+			</info>
+		</var>
+
+	</namelist> 
+	<namelist name="Dislo">
+		<name> Dislo </name>
+		<info>
+			Namelist used to define infinite straight dislocations. 
+			If dislocations of opposite Burgers vector are defined, the program will try to gather them in dipoles.
+			This has an effect on the displacement field as its discontinuity is localized on the plane surface 
+			bordered by the two dislocations. 
+			When the total Burgers vector of the simulation box is null, the elastic energy is calculated
+		       	either with or without periodic boundary conditions.
+		</info>
+
+		<var name="nd">
+			<name> nd </name>
+			<type> integer </type>
+			<default> 0 </default>
+			<mandatory> yes </mandatory>
+			<info>
+				Number of dislocations defined in the namelist.
+			</info>
+			<see_also> <ilink> bDislo </ilink> </see_also>
+			<see_also> <ilink> lDislo </ilink> </see_also>
+			<see_also> <ilink> cDislo </ilink> </see_also>
+		</var>
+		<var name="bDislo">
+			<name> bDislo </name>
+			<type> real, dim(3,200) </type>
+			<default> 0. </default>
+			<mandatory> yes </mandatory>
+			<info>
+				bDislo(1:3,i) is the Burgers vector of the dislocation numbered i.
+				If alat is defined in the namelist Input, bDislo(:,:) is multiplied by alat.
+			</info>
+			<see_also> <ilink>alat</ilink> </see_also>
+		</var>
+		<var name="lDislo">
+			<name> lDislo </name>
+			<type> real, dim(3,200) </type>
+			<default> 0. </default>
+			<mandatory> yes </mandatory>
+			<info>
+				lDislo(1:3,i) is the line vector of the dislocation numbered i.
+				Units of this vector are arbitrary as the program will normalize it.
+			</info>
+		</var>
+		<var name="cDislo">
+			<name> cDislo </name>
+			<type> real, dim(3,200) </type>
+			<default> 0. </default>
+			<mandatory> yes </mandatory>
+			<info>
+				cDislo(1:3,i) is the dislocation position, i.e. a point belonging to the dislocation line.
+				If alat is defined in the namelist Input, cDislo(:,:) is multiplied by alat.
+			</info>
+			<see_also> <ilink>alat</ilink> </see_also>
+		</var>
+		<var name="cutDislo">
+			<name> cutDislo </name>
+			<type> real, dim(3,200) </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				cutDislo(1:3,i) is used to define the infinite half plane where the dislocation creates
+				a displacement discontinuity: cutDislo(1:3,i) is the direction orthogonal to the dislocation line
+				belonging to this discontinuity half plane.
+				This does not need to be defined in the input file as the program will do it for you:
+				- if dislocations can be gathered in dipoles, the plane containing the two dislocation lines
+				will be used as a discontinuity plane.
+				- if dislocations are isolated, the glide plane will be used as a discontinuity plane. 
+				As the glide plane is well defined only when an edge component is present, an arbitrary plane
+				is used for a screw dislocation.
+			</info>
+		</var>
+	</namelist> 
+	<namelist name="DDipole">
+		<name> DDipole </name>
+		<info>
+			Namelist used to define dipoles of infinite straight dislocations. 
+			A dipole corresponds to two parallel dislocations of opposite Burgers vector.
+			This defintion is to be preferred to the one with the namelist "Dislo"
+			as this allows a better control of the displacement discontinuity. 
+		</info>
+		<var name="nDDipole">
+			<name> nDDipole </name>
+			<type> integer </type>
+			<default> 0 </default>
+			<mandatory> yes </mandatory>
+			<info>
+				Number of dislocation dipoles defined in the namelist.
+			</info>
+			<see_also> <ilink> bDDipole </ilink> </see_also>
+			<see_also> <ilink> lDDipole </ilink> </see_also>
+			<see_also> <ilink> c1DDipole </ilink> </see_also>
+			<see_also> <ilink> c2DDipole </ilink> </see_also>
+		</var>
+		<var name="bDDipole">
+			<name> bDDipole </name>
+			<type> real, dim(3,200) </type>
+			<default> 0. </default>
+			<mandatory> yes </mandatory>
+			<info>
+				bDDipole(1:3,i) is the Burgers vector of the dislocation dipole numbered i.
+				The Burgers vector of the first dislocation belonging to this dipole is bDDipole(1:3,i)
+				and the one of the second dislocation is -bDDipole(1:3,i).
+				If alat is defined in the namelist Input, bDDipole(:,:) is multiplied by alat.
+			</info>
+			<see_also> <ilink>alat</ilink> </see_also>
+		</var>
+		<var name="lDDipole">
+			<name> lDDipole </name>
+			<type> real, dim(3,200) </type>
+			<default> 0. </default>
+			<mandatory> yes </mandatory>
+			<info>
+				lDDipole(1:3,i) is the line vector of the dislocation dipole numbered i.
+				Units of this vector are arbitrary as the program will normalize it.
+			</info>
+		</var>
+		<var name="c1DDipole">
+			<name> c1DDipole </name>
+			<type> real, dim(3,200) </type>
+			<default> 0. </default>
+			<mandatory> yes </mandatory>
+			<info>
+				c1DDipole(1:3,i) is the position of the first dislocation belonging to the dipole numbered i.
+				The Burgers vector of this dislocation is bDDipole(1:3,i).
+				If alat is defined in the namelist Input, c1DDipole(:,:) is multiplied by alat.
+			</info>
+			<see_also> <ilink>alat</ilink> </see_also>
+		</var>
+		<var name="c2DDipole">
+			<name> c2DDipole </name>
+			<type> real, dim(3,200) </type>
+			<default> 0. </default>
+			<mandatory> yes </mandatory>
+			<info>
+				c2DDipole(1:3,i) is the position of the second dislocation belonging to the dipole numbered i.
+				The Burgers vector of this dislocation is -bDDipole(1:3,i).
+				If alat is defined in the namelist Input, c2DDipole(:,:) is multiplied by alat.
+			</info>
+			<see_also> <ilink>alat</ilink> </see_also>
+		</var>
+	</namelist> 
+	<namelist name="Loops">
+		<name> Loops </name>
+		<info>
+			Namelist used to define dislocation loops. 
+			Right now, only the plastic part (solid angle) of the displacement created by the loop
+			is implemented.  This allows building initial configurations containing a dislocation loop 
+			which need to be relaxed then with atomistic simulations.
+		</info>
+
+		<var name="nLoop">
+			<name> nLoop </name>
+			<type> integer </type>
+			<default> 0 </default>
+			<mandatory> yes </mandatory>
+			<info>
+				Number of loops defined in the namelist.
+			</info>
+			<see_also> <ilink>bLoop</ilink> </see_also>
+			<see_also> <ilink>iLoop</ilink> </see_also>
+			<see_also> <ilink>xLoop</ilink> </see_also>
+			<see_also> <ilink>cLoop</ilink> </see_also>
+		</var>
+		<var name="bLoop">
+			<name> bLoop </name>
+			<type> real, dim(3,20) </type>
+			<default> 0. </default>
+			<mandatory> yes </mandatory>
+			<info>
+				bLoop(1:3,i) is the Burgers vector of the loop numbered i.
+				If alat is defined in the namelist Input, bLoop(:,:) is multiplied by alat.
+			</info>
+			<see_also> <ilink>alat</ilink> </see_also>
+		</var>
+		<var name="iLoop">
+			<name> iLoop </name>
+			<type> integer, dim(100) </type>
+			<default> 0 </default>
+			<mandatory> yes </mandatory>
+			<info>
+				Number of points used to define the perimeter of the loop numbered i.
+			</info>
+			<see_also> <ilink>xLoop</ilink> </see_also>
+		</var>
+		<var name="xLoop">
+			<name> xLoop </name>
+			<type> real, dim(3,100,20) </type>
+			<default> 0. </default>
+			<mandatory> yes </mandatory>
+			<info>
+				xLoop(1:3,n,i) is the position of the point n belonging to the perimeter of the loop numbered i.
+				If alat is defined in the namelist Input, xLoop(:,:,:) is multiplied by alat.
+				These points need to be defined in continuous order along the loop perimeter
+				as they correspond to a discretization of the dislocation line defining the loop.
+			</info>
+			<see_also> <ilink>alat</ilink> </see_also>
+		</var>
+		<var name="cLoop">
+			<name> cLoop </name>
+			<type> real, dim(3,20) </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				cLoop(1:3,i) is the position of the "center" of the loop numbered i.
+				This variable is optional and is used to define the cut surface, 
+				i.e. the displacement discontinuity created by the loop, by considering triangles
+				between this point and the segments composing the loop perimeter.
+			      	If you do not define it, by default, it is taken as the gravity center
+				of all the points used to discretized the loop perimeter. 
+				If alat is defined in the namelist Input, cLoop(:,:) is multiplied by alat.
+			</info>
+			<see_also> <ilink>alat</ilink> </see_also>
+		</var>
+		<var name="xLoop_noise">
+			<name> xLoop_noise </name>
+			<type> real </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Amplitude of the noise to be added to the positions of the points 
+				defining the loop perimeter.
+			</info>
+			<see_also> <ilink>xLoop</ilink> </see_also>
+		</var>
+
+	</namelist> 
+
+<template>
+	<!--Template for namelist definition-->
+	<namelist name="">
+		<name>  </name>
+		<info>
+		</info>
+
+		<!--[>Template for variable definition<]-->
+		<var name="">
+			<name>  </name>
+			<type>  </type>
+			<default>  </default>
+			<mandatory>  </mandatory>
+			<info>
+			</info>
+			<see_also> <ilink></ilink> </see_also>
+			<see_also> <text></text> </see_also>
+			<see_also> <elink> <text> </text> <url> </url></elink> </see_also>
+		</var>
+
+	</namelist> 
+</template>
+</manual>
+
+

@@ -1,0 +1,16 @@
+&input
+
+  duplicate=.true.
+  lat(1)=9
+  lat(2)=1
+  lat(3)=9
+
+  imm=10000
+
+  inpXyz=.true.	! Xyz format for input file
+  inpFile='cu_fcc.xyz'		! Input structure file
+
+  outXyz=.true.	! Xyz format for output file
+  outFile='cu_fcc_duplicated.xyz'	! Output structure file
+
+&end

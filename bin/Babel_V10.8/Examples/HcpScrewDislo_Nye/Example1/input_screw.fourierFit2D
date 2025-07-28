@@ -1,0 +1,15 @@
+6 8 
+30.51180702613339 0.
+0. 37.181504
+ti_dislo_screw.res
+1
+5
+0.
+1.
+ti_dislo_screw.coefFourier
+0. 0.
+0. 37.181504
+30.51180702613339 37.181504
+200 200
+ti_dislo_screw.fitFourier
+

@@ -1,0 +1,21 @@
+3 configurations différentes pour un dipôle de dislocations coins:
+
+- les deux dislocations composant le dipôle peuvent partager 
+le même plan de glissement. C'est le plus simple à générere, 
+mais il y a un risque que les dislocations s'annihilent 
+au cours de la relaxation. 
+
+- les deux dislocations peuvent être mis sur deux plans de glissement 
+différents, à l'applomb de l'une de l'autre, ce qui constitue un maximum 
+d'énergie élastique. Les dislocations, en équilibre instable,
+peuvent donc bouger au cours de la relaxation. L'avantage est que les 
+vecteurs de périodicité restent orthogonaux les uns aux autres.
+
+- enfin, les deux dislocations peuvent être mises sur deux plans de glissement
+différents et en position minimisant leur interaction élastique. 
+C'est le mieux mais ça oblige à travailler avec des vecteurs de périodicité
+qui ne sont plus orthogonaux.
+
+On peut choisir à chaque fois de travailler dans le repère de la maille cubique
+(..._WithoutRotation) ou dans celui naturel pour la dislocation (...WithRotation). 
+Je recommande plutôt ce dernier repère.

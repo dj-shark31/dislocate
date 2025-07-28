@@ -1,0 +1,71 @@
+Screw dislocation dipole with Burgers vector b=a[1 1 1] in bcc Fe. 
+Quadrupolar periodic arrangement.
+
+
+1) Directory 1_Rotation: 
+
+Rotate elastic constants to obtain their values in the axis
+	ex = [-1 -1 2]
+	ey = [1 -1 0]
+	ez = [1 1 1]	
+# babel input_rotation.babel | tee output_rotation.babel
+
+You can apply inverse rotation to check that you get back 
+the cubic elastic constants and that the atomic positions 
+are the correct ones in cubic axis
+# babel input_inverse_rotation.babel | tee output_inverse_rotation.babel
+
+
+2) Directory 2_Dislocation
+
+Generate dislocation dipole
+# babel input_dislo.babel | tee output_dislo.babel
+
+
+3) Directory 3_VitekMap
+
+Calculate atomic displacement by comparing atomic positions
+between the two simulation cells (relaxed dislo dipole and perfect crystal)
+# displacement input_vitek.displacement | tee output_vitek.displacement
+This generates the file fe_dislo_displacement.xyz
+
+Create necessary files to plot vitek map
+# vitek
+and then answer to the different questions
+or you can directly use the command
+# vitek_bcc fe_dislo_displacement.xyz fe_dislo_displacement.xyz 2.850
+If the gnuplot script file vitek.gnu already exists, it won't be overwriten
+
+Plot vitek map
+# gnuplot vitek.gnu
+You can personalize the gnuplot script file
+
+
+4) Directory 4_NyeMap
+
+Generate file defining crystallographic for bcc crystal
+# patternInit input.patternInit
+
+Calculate Nye tensor on each atomic position
+# displacement input_nye.displacement
+
+Interpolate data points between atomic positions
+using 2D Fourier series
+# fourierFit2D < input.fourierFit2D
+
+Plot the result with gnuplot script nye.gnu
+# gnuplot nye.gnu
+
+
+5) Directory 5_VitekNyeMap
+
+Combine Vitek and Nye maps to make a single plot
+
+# displacement input_vitek.displacement | tee output_vitek.displacement
+# vitek_bcc fe_dislo_displacement.xyz fe_dislo_displacement.xyz 2.850
+# patternInit input.patternInit
+# displacement input_nye.displacement
+# fourierFit2D < input.fourierFit2D
+# gnuplot vitek_nye.gnu
+
+
