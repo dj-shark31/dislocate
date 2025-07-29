@@ -21,18 +21,17 @@ def main():
     parser.add_argument('--oxygen', type=int, default=0)
     parser.add_argument('--pbc', type=str, default='false')
     parser.add_argument('--config', default='S')
-    parser.add_argument('--ovito_bin', default='ovitos')
-    parser.add_argument('--ovito_sif', default=abspath_from_script('../../bin/ovito.sif'))
+    parser.add_argument('--ovito_path', default=abspath_from_script('../../bin/ovito.sif'))
     args = parser.parse_args()
 
     # Run ovito_elastStab.py
-    run(['singularity', 'exec', '-B', '.:/mnt/', args.ovito_sif, args.ovito_bin,
+    run(['singularity', 'exec', '-B', '.:/mnt/', args.ovito_path, 'ovitos',
          abspath_from_script("ovito_elastStab.py"),
          args.ref_cell, args.dis_cell, args.tmp_stab,
          str(args.b), str(args.oxygen)])
 
     # Run ovito_dxa.py
-    run(['singularity', 'exec', '-B', '.:/mnt/', args.ovito_sif, args.ovito_bin,
+    run(['singularity', 'exec', '-B', '.:/mnt/', args.ovito_path, 'ovitos',
          abspath_from_script("ovito_dxa.py"),
          args.dis_cell, str(int(args.thickness)), args.tmp_dxa, str(args.oxygen), args.config])
 
