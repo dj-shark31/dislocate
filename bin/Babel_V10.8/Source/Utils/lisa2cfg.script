@@ -1,0 +1,32 @@
+
+printUsage() {
+	echo "Usage: $0 input_file output_file"
+	echo "  input file with lisa format"
+	echo "  output file with cfg format"
+	exit 1
+}
+
+if [ $# \< 2 ]; then
+	printUsage
+fi
+
+lisaFile=$1
+cfgFile=$2
+
+if [ ! -f $lisaFile ]; then
+	echo "file $lisaFile does not exist"
+	exit
+fi
+
+tmpFile=`mktemp`
+echo > $tmpFile "
+&input
+  verbosity=0
+  inpLisa=.true.
+  inpFile='$lisaFile'
+  outCfg=.true.
+  outFile='$cfgFile'
+&end
+" 
+$babel $tmpFile
+rm -f $tmpFile

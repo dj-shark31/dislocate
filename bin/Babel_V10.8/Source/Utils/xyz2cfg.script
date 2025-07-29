@@ -1,0 +1,50 @@
+
+printUsage() {
+	echo "Usage: $0 [-alat a] input_file [output_file]"
+	echo "  input file with xyz format"
+	echo "  output file with cfg format"
+	echo "  a: lattice parameter used to normalize output"
+	exit 1
+}
+
+a="1."
+
+# Check for lattice parameter
+if [ $# \> 2 ]; then
+	if [ $1 == "-alat" ]; then
+		a=$2
+	else
+		printUsage
+	fi
+	shift ; shift
+fi
+
+# Names of input and output files
+if [ $# == 1 ]; then
+	xyzFile=$1
+	cfgFile=`basename -s ".xyz" $xyzFile`.cfg
+elif [ $# == 2 ]; then
+	xyzFile=$1
+	cfgFile=$2
+else
+	printUsage
+fi
+
+if [ ! -f $xyzFile ]; then
+	echo "file $xyzFile does not exist"
+	exit 1
+fi
+
+tmpFile=`mktemp`
+echo > $tmpFile "
+&input
+  verbosity=0
+  inpXyz=.true.
+  inpFile='$xyzFile'
+  outCfg=.true.
+  outFile='$cfgFile'
+  out_alat=$a
+&end
+" 
+$babel $tmpFile
+rm -f $tmpFile

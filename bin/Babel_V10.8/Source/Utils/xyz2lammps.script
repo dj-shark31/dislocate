@@ -1,0 +1,37 @@
+
+printUsage() {
+	echo "Usage: $0 input_file [output_file]"
+	echo "  input file with xyz format"
+	echo "  output file with lammps format"
+	exit 1
+}
+
+
+# Names of input and output files
+if [ $# == 1 ]; then
+	xyzFile=$1
+	lammpsFile=`basename -s ".xyz" $xyzFile`.dump
+elif [ $# == 2 ]; then
+	xyzFile=$1
+	lammpsFile=$2
+else
+	printUsage
+fi
+
+if [ ! -f $xyzFile ]; then
+	echo "file $xyzFile does not exist"
+	exit 1
+fi
+
+tmpFile=`mktemp`
+echo > $tmpFile "
+&input
+  verbosity=0
+  inpXyz=.true.
+  inpFile='$xyzFile'
+  outLammps=.true.
+  outFile='$lammpsFile'
+&end
+" 
+$babel $tmpFile
+rm -f $tmpFile

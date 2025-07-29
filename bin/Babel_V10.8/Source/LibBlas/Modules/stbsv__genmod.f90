@@ -1,0 +1,18 @@
+        !COMPILER-GENERATED INTERFACE MODULE: Mon Nov 20 15:48:26 2017
+        ! This source file is for reference only and may not completely
+        ! represent the generated interface used by the compiler.
+        MODULE STBSV__genmod
+          INTERFACE 
+            SUBROUTINE STBSV(UPLO,TRANS,DIAG,N,K,A,LDA,X,INCX)
+              INTEGER(KIND=4) :: LDA
+              CHARACTER(LEN=1) :: UPLO
+              CHARACTER(LEN=1) :: TRANS
+              CHARACTER(LEN=1) :: DIAG
+              INTEGER(KIND=4) :: N
+              INTEGER(KIND=4) :: K
+              REAL(KIND=4) :: A(LDA,*)
+              REAL(KIND=4) :: X(*)
+              INTEGER(KIND=4) :: INCX
+            END SUBROUTINE STBSV
+          END INTERFACE 
+        END MODULE STBSV__genmod

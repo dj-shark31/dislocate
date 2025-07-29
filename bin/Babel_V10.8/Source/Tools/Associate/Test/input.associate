@@ -1,0 +1,13 @@
+&input
+  
+  refSiesta=.true.
+  refFile='fe_bcc_dislo.STRUCT_OUT'
+  inpCfg=.true.
+  inpFile='fe_bcc_dislo.cfg'
+
+  outCfg=.true.
+  outFile='new.cfg'
+
+
+
+&end

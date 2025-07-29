@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="input_xx.xsl" type="text/xsl"?>
+<manual>
+	<title>
+		Program prepareDrag
+	</title>
+	<intro> 
+		This program creates a new configuration file by linear interpolation 
+		of an initial and a final configuration. 
+		It also builds a constraint file which can be used then 
+		to performed constrained minimization (drag).
+	
+
+		Execution:
+		=========
+		prepareDrag input.dat
+		where input.dat is the input file
+		If input.dat="-", the input is read from current unit (keyboard or piped other command like echo)
+
+
+		Structure of the input file:
+		===========================
+
+		The input file contains only the namelist input
+
+		&amp;input
+		  ...
+		//
+
+	</intro>
+	<namelist name="input">
+		<name> input </name>
+
+		<var name="inp0File, inp1File">
+			<name>	inp0File, inp1File </name>
+			<type> character string </type>
+			<default> '-' </default>
+			<mandatory> yes </mandatory>
+			<info>
+				Name of the initial (inp0File) and final (inp1File) 
+				structure files used as inputs
+				If inp0File='-' or inp1File="-", the structure is read from keyboard.
+				The file formats are defined by inp0Xyz | inp0Cfg | inp0Gin | inp0Siesta | inp0NDM | inpt0Lammps | inp0Poscar
+				and by inp1Xyz | inp1Cfg | inp1Gin | inp1Siesta | inp1NDM | inpt1Lammps | inp1Poscar
+			</info>
+			<see_also> <ilink>inp0Xyz, inp0Cfg, inp0Gin, inp0Siesta, inp0NDM, inp0Lammps, inp0Poscar</ilink> </see_also>
+			<see_also> <ilink>inp1Xyz, inp1Cfg, inp1Gin, inp1Siesta, inp1NDM, inp1Lammps, inp1Poscar</ilink> </see_also>
+		</var>
+		<var name="inp0Xyz, inp0Cfg, inp0Gin, inp0Siesta, inp0NDM, inp0Lammps, inp0Poscar">
+			<name>	inp0Xyz, inp0Cfg, inp0Gin, inp0Siesta, inp0NDM, inp0Lammps, inp0Poscar  </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> one should be set to .true. </mandatory>
+			<info>
+				If inp0Xyz=.true. the input structure file 
+				corresponding to initial configuration
+				is given in xyz format.
+			</info>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+			<see_also> <ilink>inp0File, inp1File</ilink> </see_also>
+		</var>
+		<var name="inp1Xyz, inp1Cfg, inp1Gin, inp1Siesta, inp1NDM, inp1Lammps, inp1Poscar">
+			<name>	inp1Xyz, inp1Cfg, inp1Gin, inp1Siesta, inp1NDM, inp1Lammps, inp1Poscar  </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> one should be set to .true. </mandatory>
+			<info>
+				If inp1Xyz=.true. the input structure file 
+				corresponding to final configuration
+				is given in xyz format.
+			</info>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+			<see_also> <ilink>inp0File, inp1File</ilink> </see_also>
+		</var>
+		<var name="imm">
+			<name>	imm </name>
+			<type> integer </type>
+			<default> 0 </default>
+			<mandatory> useless </mandatory>
+			<info>
+				Maximal number of atom in the structure.
+			</info>
+		</var>
+		<var name="clipAtom">
+			<name> clipAtom </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If clipAtom=.true., periodic boundary conditions are applied
+			       	to atom coordinates to bring them back in the primitive unit cell.
+				The periodicity vectors have to be defined.
+				The transformation is applied both to the input and the reference structures.
+			</info>
+		</var>
+		<var name="clipDisplacement">
+			<name> clipDisplacement </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If clipDisplacement=.true., periodic boundary conditions are applied
+				to atom displacements.
+				The periodicity vectors have to be defined.
+			</info>
+		</var>
+		<var name="xNoise">
+			<name> xNoise </name>
+			<type> real </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				If positive, add to the atomic positions of the interpolated structure
+		       	 	a noise which amplitude is equal to xNoise multiplied by alat.
+				The gravity center is kept fixed, as well as the reaction coordinate
+				(the noise belongs to the hyperplane orthogonal to the transition direction).
+			</info>
+			<see_also> <ilink> alat </ilink> </see_also>
+		</var>
+		<var name="alat">
+			<name> alat </name>
+			<type> real </type>
+			<default> 1. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Length used to scale all distances in the present input file,
+			        actually only xNoise.	
+				It has no effect on the atomic configuration read in input structure file.
+			</info>
+		</var>
+		<var name="outFile">
+			<name> outFile </name>
+			<type> character string </type>
+			<default> '-' </default>
+			<mandatory> no </mandatory>
+			<info>
+				Name of the structure file where to save the interpolated structure.
+				If outFile="-", the output file is printed on screen.
+				The file format is defined by outXyz | outCfg  | outGin | outSiesta | outNDM | outLammps | outPoscar
+			</info>
+			<see_also> <ilink>outXyz, outCfg, outGin, outSiesta, outNDM, outLammps, outPoscar</ilink> </see_also>
+			<see_also> <ilink>out_alat</ilink> </see_also>
+		</var>
+		<var name="outXyz, outCfg, outGin, outSiesta, outNDM, outLammps, outPoscar">
+			<name> outXyz, outCfg, outGin, outSiesta, outNDM, outLammps, outPoscar </name>
+			<type> logical </type>
+			<default> .false. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Format of the structure file used for output.
+				If all variables are set to .false. (default), the output structure
+				is not written.
+			</info>
+			<see_also> <ilink> outFile </ilink> </see_also>
+		</var>
+		<var name="out_alat">
+			<name> out_alat </name>
+			<type> real </type>
+			<default> 1. </default>
+			<mandatory> no </mandatory>
+			<info>
+				When the output structure is written with xyz or cfg file format,
+				atomic positions and periodicity vectors can be scaled by a lattice parameter
+				given in out_alat.
+			</info>
+			<see_also> <ilink> outFile </ilink> </see_also>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+		</var>
+		<var name="constrFile">
+			<name> constrFile </name>
+			<type> character string </type>
+			<default> '' </default>
+			<mandatory> no </mandatory>
+			<info>
+				File where the constraint should be stored. 
+				This file contains the direction defining the hyperplane 
+				where atomic forces have to be projected to perform
+				constrained minimization.
+				If constrFile="", the file is not written.
+				If constrFile="-", the file is printed on screen
+			</info>
+		</var>
+		<var name="zeta">
+			<name> zeta </name>
+			<type> real </type>
+			<default> 0. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Reaction coordinate defining the mixing
+			       	between the initial configuration, multiplied by zeta,
+				and the final configuration, multiplied by (1-zeta),
+				to obtain the interpolated configuration
+			</info>
+		</var>
+		<var name="reduced">
+			<name> reduced </name>
+			<type> logical </type>
+			<default> .FALSE. </default>
+			<mandatory> no </mandatory>
+			<info>
+				Tells if the interpolation and the constraint 
+				should be performed on reduced (crystal) atomic coordinates.
+				Useful if the initial and final configurations do not have
+				the same periodicity vectors.
+			</info>
+		</var>
+		<var name="nxSlab, nySlab, nzSlab">
+			<name> nxSlab, nySlab, nzSlab </name>
+			<type> integers </type>
+			<default> 1 </default>
+			<mandatory> no </mandatory>
+			<info>
+				Modify periodicity vectors to take into account the fact that unit cells can
+           			have been duplicated in each direction.
+
+				Not sure that this is working!
+			</info>
+		</var>
+		<var name="nTypes">
+			<name> nTypes </name>
+			<type> integer </type>
+			<default> 0 </default>
+			<mandatory> no </mandatory>
+			<info>
+				Number of different atom types. This is necessary only if you want to define 
+				the label(:) property for each atom and this cannot be obtained from the 
+				input structure file. Otherwise, the number of different atom types 
+				should be set automatically after reading the input structure file.
+			</info>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+			<see_also> <ilink>label</ilink> </see_also>
+		</var>
+		<var name="label">
+			<name> label </name>
+			<type> character(len=5), dim(360) </type>
+			<default> (/ A, B, ... /) </default>
+			<mandatory> no  </mandatory>
+			<info>
+				Label corresponding to each atom type if necessary and it cannot be obtained 
+				from the input structure file.
+			</info>
+			<see_also> <ilink>nTypes</ilink> </see_also>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+		</var>
+		<var name="mass">
+			<name> mass </name>
+			<type> real, dim(360) </type>
+			<default> 0. </default>
+			<mandatory> no  </mandatory>
+			<info>
+				Mass corresponding to each atom type if necessary and it cannot be obtained 
+				from the input structure file.
+			</info>
+			<see_also> <ilink>nTypes</ilink> </see_also>
+			<see_also> <elink> <text>Structure file formats</text> <url>./structures.html</url></elink> </see_also>
+		</var>
+		<var name="verbosity">
+			<name> verbosity </name>
+			<type> integer </type>
+			<default> 4 </default>
+			<mandatory> no </mandatory>
+			<info>
+				Integer values defining amount of information on output unit.
+				verbosity=0: no output
+				verbosity=4: normal output
+				verbosity>=10: debugging
+			</info>
+		</var>
+
+		<!--[>Template for variable definition<]-->
+		<!--<var name="">-->
+			<!--<name>  </name>-->
+			<!--<type>  </type>-->
+			<!--<default>  </default>-->
+			<!--<mandatory>  </mandatory>-->
+			<!--<info>-->
+			<!--</info>-->
+			<!--<see_also>  </see_also>-->
+		<!--</var>-->
+	</namelist> 
+</manual>
