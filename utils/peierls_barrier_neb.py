@@ -62,44 +62,98 @@ def write_energies(images: List[Atoms], output_file: str) -> None:
     
     print(f"Energies written to {output_file}")
 
-def relax_intermediate_images(args, output_dir: str) -> None:
+def relax_intermediate_images(images: List[Atoms], potential_path: str, relax_fmax: float = 0.001, output_dir: str = None, device: str = "cpu") -> None:
     """Relax all intermediate images individually and output their energies."""
     
-    print(f"Relaxing {args.n_images} intermediate images individually...")
+    print(f"Relaxing {len(images)} intermediate images individually...")
     
-    # Create output file for relaxed energies
-    relaxed_energies_file = os.path.join(output_dir, 'energies_relaxed_cell.dat')
-    
-    with open(relaxed_energies_file, 'w') as f:
-        f.write("# Relaxed Intermediate Image Energies\n")
-        f.write("# Image_Index  Energy_eV \n")
+    relaxed_energies = []
+    relaxed_images = []
+    for i, image in enumerate(images):
+        print(f"  Relaxing image {i}...")
+
+        image.calc = MACECalculator(model_paths=potential_path, device=device)
         
-        # Relax intermediate images (skip first and last)
-        for i in range(1, args.n_images + 1):
-            print(f"  Relaxing image {i}...")
+        # Create optimizer for this image
+        optimizer = BFGS(image, logfile=None)
+            
+        # Relax the image
+        optimizer.run(fmax=relax_fmax, steps=1000)
+            
+        # Get final energy and steps
+        relaxed_energies.append(image.get_potential_energy())
+        relaxed_images.append(image)
+        print(f"Image {i} relaxed: Energy = {relaxed_energies[-1]:.6f} eV")
 
-            intermediate_image = read(os.path.join(output_dir, f'{i}.poscar'))
 
-            intermediate_image.calc = MACECalculator(model_paths=args.potential_path, device=args.device)
-            
-            # Create optimizer for this image
-            optimizer = BFGS(intermediate_image, logfile=None)
-            
-            # Relax the image
-            optimizer.run(fmax=args.relax_fmax, steps=1000)
-            
-            # Get final energy and steps
-            energy = intermediate_image.get_potential_energy()
-            
-            # Write to file
-            f.write(f"{i:10d}  {energy:12.6f} \n")
-            
-            # Save relaxed structure
-            write(os.path.join(output_dir, f'{i}_relaxed.poscar'), intermediate_image, format='vasp')
-            
-            print(f"Image {i} relaxed: Energy = {energy:.6f} eV")
+    if output_dir is not None:
+        relaxed_energies_file = os.path.join(output_dir, 'energies_relaxed_cell.dat')
+        with open(relaxed_energies_file, 'w') as f:
+            f.write("# Relaxed Intermediate Image Energies\n")
+            f.write("# Image_Index  Energy_eV \n")
+            for i, energy in enumerate(relaxed_energies):
+                f.write(f"{i:10d}  {energy:12.6f} \n")
+                write(os.path.join(output_dir, f'{i}_relaxed.poscar'), relaxed_images[i], format='vasp')
+        print(f"Relaxed intermediate energies written to {relaxed_energies_file}")
+
+    return relaxed_energies, relaxed_images
     
-    print(f"Relaxed intermediate energies written to {relaxed_energies_file}")
+
+def run_neb(initial: Atoms, final: Atoms, n_images: int, potential_path: str, 
+            output_dir: str = None, neb_fmax: float = 0.005, output_preopt: str = "false", device: str = "cpu") -> List[Atoms]:
+    """
+    Run NEB calculation between initial and final images and save outputs.
+    
+    Args:
+        initial: Initial atomic configuration
+        final: Final atomic configuration 
+        n_images: Number of intermediate images
+        potential_path: Path to MACE potential file
+        device: Device for MACE calculation (cpu/cuda)
+        output_dir: Directory to save output files
+        neb_fmax: Force convergence criterion for NEB
+        output_preopt: Whether to output pre-optimized images
+        
+    Returns:
+        List of optimized images including initial and final
+    """
+    # Create images list: initial + intermediate + final
+    images = [initial]
+    for _ in range(n_images):
+        images.append(initial.copy())
+    images.append(final)
+    
+    # Interpolate linearly between initial and final
+    neb = NEB(images)
+    neb.interpolate(mic=True)
+    
+    # Assign MACE calculator to all images
+    print(f"Loading MACE potential from: {potential_path}")
+    for image in images:
+        image.calc = MACECalculator(model_paths=potential_path, device=device)
+
+    # Output pre-optimized images if requested
+    if output_preopt == "true":
+        print(f"Outputting pre-optimized images to {output_dir}")
+        for i, image in enumerate(images):
+            write(os.path.join(output_dir, f'{i}_preopt.poscar'), image, format='vasp')
+
+    # Run NEB optimization
+    print(f"Starting NEB optimization with {n_images} intermediate images...")
+    optimizer = FIRE(neb, trajectory=os.path.join(output_dir,'neb.traj'), 
+                    logfile=os.path.join(output_dir,'neb.log'))
+    optimizer.run(fmax=neb_fmax, steps=1000)
+
+    if output_dir is not None:
+        # Write final energies
+        write_energies(images, os.path.join(output_dir, 'energies.dat'))
+
+        # Save optimized images
+        for i, image in enumerate(images):
+            write(os.path.join(output_dir, f'{i}.poscar'), image, format='vasp')
+
+    print("NEB optimization completed")
+    return images
 
 
 def main():
@@ -110,63 +164,32 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
     
     if args.perform_neb == "true":
-        # --- LOAD INITIAL AND FINAL IMAGES ---
-        
+        # Load initial and final images
         print(f"Loading initial image from: {args.initial}")
         print(f"Loading final image from: {args.final}")
         print(f"Using MACE potential: {args.potential_path}")
         
         initial = read(args.initial)
         final = read(args.final)
-        
-        # --- SETUP IMAGES ---
-        
-        # Create images list: initial + intermediate + final
-        images = [initial]
-        for _ in range(args.n_images):
-            images.append(initial.copy())
-        images.append(final)
-        
-        # Interpolate linearly between initial and final
-        neb = NEB(images)
-        neb.interpolate(mic=True)
-        
-        # --- ASSIGN MACE CALCULATOR ---
-        
-        print(f"Loading MACE potential from: {args.potential_path}")
-        
-        for image in images:
-            image.calc = MACECalculator(model_paths=args.potential_path, device=args.device)
 
-        # --- OUTPUT IMAGE INTERPOLATION ---
-
-        if args.output_preopt_images == "true":
-            print(f"Outputting pre-optimized images to {args.output_dir}")
-            for i, image in enumerate(images):
-                write(os.path.join(args.output_dir, f'{i}_preopt.poscar'), image, format='vasp')
-
-        # --- OPTIMIZATION ---
-    
-        print(f"Starting NEB optimization with {args.n_images} intermediate images...")
-        optimizer = FIRE(neb, trajectory=os.path.join(args.output_dir,'neb.traj'), logfile=os.path.join(args.output_dir,'neb.log'))
-        optimizer.run(fmax=args.neb_fmax, steps=1000)
-    
-        # --- WRITE ENERGIES ---
-        
-        write_energies(images, os.path.join(args.output_dir, 'energies.dat'))
-
-        # --- SAVE OUTPUT ---
-        
-        for i, image in enumerate(images):
-            write(os.path.join(args.output_dir, f'{i}.poscar'), image, format='vasp')
+        # Run NEB optimization
+        images = run_neb(initial, final, args.n_images, args.potential_path, args.output_dir, 
+                                        args.neb_fmax, args.output_preopt_images, args.device)
 
     else:
         print("Skipping NEB optimization")
         
-       # --- RELAX INTERMEDIATE IMAGES (OPTIONAL) ---
+    # Relax intermediate images if requested
     if args.relax_intermediate_images == "true":
+        if args.perform_neb == "false":
+            print(f"Loading images from {args.output_dir}")
+            images = []
+            for i in range(1, args.n_images + 1):
+                images.append(read(os.path.join(args.output_dir, f'{i}.poscar')))
+        else:
+            images = images[1:-1] # Remove initial and final images
         print(f"Relaxing intermediate images to {args.output_dir}")
-        relax_intermediate_images(args, args.output_dir)
+        relax_intermediate_images(images, args.potential_path, args.relax_fmax, args.output_dir, args.device)
         
     print("NEB simulation complete. Results saved in 'neb_images'.")
 
