@@ -2,7 +2,7 @@ import os
 import tempfile
 import subprocess
 from ase.io import read, write
-from mace.calculators import MACECalculator
+from utils.atomistic_tools import set_calculator
 from ase.optimize import BFGS
 import argparse
 import numpy as np
@@ -43,6 +43,7 @@ def main():
     parser.add_argument('--remove_original', type=str, default="false", help="Remove original structure (default: false)")
     parser.add_argument('--cij', nargs=5, type=float, default=[177.1, 84.8, 82.9, 193.8, 54.8], help="Cij matrix [c11 c12 c13 c33 c44] (default: 177.1 84.8 82.9 193.8 54.8)")
     parser.add_argument('--analyze_core', type=str, default="false", help="Run analyze_core.py (default: false)")
+    parser.add_argument('--device', type=str, default='cpu', help="Device for MACE calculation (default: cpu)")
     args = parser.parse_args()
 
     # Parse arguments
@@ -100,15 +101,11 @@ def main():
         os.remove(tmpbabel)
 
     # Set up the MACE calculator for relaxation
-    calculator = MACECalculator(model_paths=args.potential_path, device='cpu')
     for i in range(len(args.xpos)):
         cell = os.path.join(args.output_dir, f"x{args.xpos[i]}_y{args.ypos[i]}_nx{args.n_cells[0]}ny{args.n_cells[1]}.poscar")
         # Read the generated structure
         atoms = read(cell, format="vasp")
-        if isinstance(atoms, list):
-            atoms = atoms[0]
-        atoms.pbc = (True, True, True)
-        atoms.calc = calculator
+        set_calculator(atoms, args.potential_path, device=args.device)
         # Relax the structure using BFGS
         dyn = BFGS(atoms)
         dyn.run(fmax=args.fmax)

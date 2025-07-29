@@ -1,7 +1,7 @@
 from ase.io import read, write
 from ase.mep import NEB
 from ase.optimize import FIRE, BFGS
-from mace.calculators import MACECalculator
+from utils.atomistic_tools import set_calculator
 from ase import Atoms
 import os
 import argparse
@@ -72,7 +72,7 @@ def relax_intermediate_images(images: List[Atoms], potential_path: str, relax_fm
     for i, image in enumerate(images):
         print(f"  Relaxing image {i}...")
 
-        image.calc = MACECalculator(model_paths=potential_path, device=device)
+        set_calculator(image, potential_path, device=device)
         
         # Create optimizer for this image
         optimizer = BFGS(image, logfile=None)
@@ -130,7 +130,7 @@ def run_neb(initial: Atoms, final: Atoms, n_images: int, potential_path: str,
     # Assign MACE calculator to all images
     print(f"Loading MACE potential from: {potential_path}")
     for image in images:
-        image.calc = MACECalculator(model_paths=potential_path, device=device)
+        set_calculator(image, potential_path, device=device)
 
     # Output pre-optimized images if requested
     if output_preopt == "true":

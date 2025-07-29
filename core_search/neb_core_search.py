@@ -21,7 +21,7 @@ import argparse
 import os
 from ase.io import read, write
 from utils.peierls_barrier_neb import run_neb, relax_intermediate_images
-from ase.calculators.mace import MACECalculator
+from utils.atomistic_tools import get_energy, get_stress
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -48,13 +48,6 @@ def parse_arguments():
                        choices=['cpu', 'cuda'], help='Device for MACE calculation (default: cpu)')
     return parser.parse_args()
 
-def get_energy(image, potential_path, device):
-    """
-    Get the energy of an image.
-    """
-    image.calc = MACECalculator(model_paths=potential_path, device=device)
-    return image.get_potential_energy()
-
 def get_unique_state_energy(initial_energy, final_energy, intermediate_energies, energy_tolerance):
     unique_states = []
     for i, energy in enumerate(intermediate_energies):
@@ -77,8 +70,8 @@ def get_new_cell(initial_image, final_image, n_images, potential_path, neb_fmax=
     """
     Get a new cell by running NEB and relaxing intermediate images.
     """
-    initial_energy = get_energy(initial_image, potential_path, device)
-    final_energy = get_energy(final_image, potential_path, device)
+    initial_energy = get_energy(initial_image, potential_path, device=device)
+    final_energy = get_energy(final_image, potential_path, device=device)
     if abs(initial_energy - final_energy) < energy_tolerance:
         print("Initial and final energies are too close to each other. No need to run NEB.")
         return None

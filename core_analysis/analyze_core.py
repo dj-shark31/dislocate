@@ -44,8 +44,7 @@ import shlex
 from concurrent.futures import ProcessPoolExecutor
 from ase.io import read
 from ase.atoms import Atoms
-import numpy as np
-from ase.geometry import get_distances
+from utils.translate_dislocation import reorder_atoms_to_reference
 
 def parse_input_file(path):
     """Parse key=value pairs from the input file."""
@@ -77,61 +76,6 @@ def abspath_from_script(rel_path):
     """Return absolute path relative to the directory containing this script."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     return os.path.abspath(os.path.join(script_dir, rel_path))
-
-def reorder_atoms_to_reference(atoms: Atoms, ref_atoms: Atoms) -> Atoms:
-    """
-    Reorder atoms to match reference structure with minimal distances.
-    
-    Args:
-        atoms: Atoms object to reorder
-        ref_atoms: Reference Atoms object
-        
-    Returns:
-        Reordered Atoms object
-    """
-    if len(atoms) != len(ref_atoms):
-        raise ValueError("Number of atoms must match between structures")
-    
-    # Calculate distance matrix
-    pos1 = ref_atoms.get_positions()
-    pos2 = atoms.get_positions()
-    
-    _, distances = get_distances(pos1, pos2, ref_atoms.cell, pbc=True)
-    
-    row_indices = []
-    for i in range(len(atoms)):
-        min_idx = np.argmin(distances[i])
-        if min_idx in row_indices:
-            # If duplicate found, get next closest atom not already used
-            sorted_indices = np.argsort(distances[i])
-            for idx in sorted_indices:
-                if idx not in row_indices:
-                    min_idx = idx
-                    break
-        row_indices.append(min_idx)
-    # Create new atoms object with reordered positions
-    reordered_atoms = atoms.copy()
-    
-    # Reorder atomic positions
-    new_positions = atoms.get_positions()[row_indices]
-    reordered_atoms.set_positions(new_positions)
-    
-    # Reorder atomic numbers and other properties if they exist
-    if hasattr(atoms, 'get_atomic_numbers'):
-        new_numbers = atoms.get_atomic_numbers()[row_indices]
-        reordered_atoms.set_atomic_numbers(new_numbers)
-    
-    # Reorder tags if they exist
-    if hasattr(atoms, 'get_tags'):
-        new_tags = atoms.get_tags()[row_indices]
-        reordered_atoms.set_tags(new_tags)
-    
-    # Reorder momenta if they exist
-    if hasattr(atoms, 'get_momenta'):
-        new_momenta = atoms.get_momenta()[row_indices]
-        reordered_atoms.set_momenta(new_momenta)
-    
-    return reordered_atoms
 
 def main():
     parser = argparse.ArgumentParser(description='Python version of main.sh (POSCAR-only version)')
