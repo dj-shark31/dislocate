@@ -9,6 +9,7 @@ import subprocess
 import os
 from analyze_core import abspath_from_script
 import subprocess
+from utils.config_loader import get_tool_path
 
 def escape_path(path):
     """Escape forward slashes in path for sed replacement"""
@@ -19,12 +20,12 @@ def main():
     parser.add_argument('a0')
     parser.add_argument('coa0')
     parser.add_argument('tmp_pattern')
-    parser.add_argument('--patternInit_dat', default=abspath_from_script('patternInit.dat'))
-    parser.add_argument('--patternInit_bin', default=abspath_from_script('../../bin/Babel_V10.8/bin/patternInit'))
     args = parser.parse_args()
 
+    patternInit_path = get_tool_path('patternInit')
+
     # Read template
-    with open(args.patternInit_dat, 'r') as f:
+    with open(abspath_from_script('patternInit.dat'), 'r') as f:
         template = f.read()
 
     # Substitute values
@@ -38,7 +39,7 @@ def main():
         tmp.write(filled)
 
     # Run patternInit
-    subprocess.run([args.patternInit_bin, tmp_input], check=True)
+    subprocess.run([patternInit_path, tmp_input], check=True)
 
     # Clean up
     os.remove(tmp_input)

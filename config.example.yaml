@@ -1,0 +1,8 @@
+# config.yaml
+
+tools:
+  ovitosif: /path/to/ovito.sif
+  babel: /opt/babel/babel
+  displacement: /opt/babel/displacement
+  patternDetect: /opt/babel/patternDetect
+  patternInit: /opt/babel/patternInit

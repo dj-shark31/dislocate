@@ -15,3 +15,15 @@ A modified version of OVITO is required for visualization:
 - Once downloaded, place `ovito.sif` in the `bin/` directory
 
 Note: The standard OVITO installation will not work - you must use the modified version.
+
+## Configuration
+
+To run scripts that depend on external tools (e.g. Ovito, Babel), create a `config.yaml` file:
+
+```yaml
+tools:
+  ovitosif: /path/to/ovito.sif
+  babel: /opt/babel/babel
+  displacement: /opt/babel/displacement
+  patternDetect: /opt/babel/patternDetect
+  patternInit: /opt/babel/patternInit

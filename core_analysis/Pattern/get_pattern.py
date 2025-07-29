@@ -7,6 +7,7 @@ import os
 import tempfile
 import subprocess
 from analyze_core import abspath_from_script
+from utils.config_loader import get_tool_path
 
 def escape_path(path):
     """Escape forward slashes in path for sed replacement"""
@@ -19,9 +20,9 @@ def main():
     parser.add_argument('a0')
     parser.add_argument('natom', type=int)
     parser.add_argument('tmp_pattern')
-    parser.add_argument('--pattern_dat', default=abspath_from_script('pattern.dat'))
-    parser.add_argument('--patternDetect_bin', default=abspath_from_script('../../bin/Babel_V10.8/bin/patternDetect'))
     args = parser.parse_args()
+
+    patternDetect_path = get_tool_path('patternDetect')
 
     # Determine nrep, duplicate, imm
     if args.thickness == 1:
@@ -36,7 +37,7 @@ def main():
     imm = args.natom * nrep
 
     # Read template
-    with open(args.pattern_dat, 'r') as f:
+    with open(abspath_from_script('pattern.dat'), 'r') as f:
         template = f.read()
 
     # Substitute values
@@ -53,7 +54,7 @@ def main():
         tmp.write(filled)
 
     # Run patternDetect
-    subprocess.run([args.patternDetect_bin, tmp_input], check=True)
+    subprocess.run([patternDetect_path, tmp_input], check=True)
 
     # Clean up
     os.remove(tmp_input)

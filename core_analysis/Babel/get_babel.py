@@ -9,6 +9,7 @@ import os
 import subprocess
 import tempfile
 from analyze_core import abspath_from_script
+from utils.config_loader import get_tool_path
 
 def main():
     parser = argparse.ArgumentParser(description='Run Babel displacement calculations')
@@ -21,9 +22,10 @@ def main():
     parser.add_argument('tmp_babel', help='Temporary Babel output file')
     parser.add_argument('oxygen', type=int, choices=[0, 1], 
                        help='Oxygen flag (0=keep, 1=delete)')
-    parser.add_argument('--babel_path', default=abspath_from_script('../../bin/Babel_V10.8/bin/displacement'))
     
     args = parser.parse_args()
+    
+    displacement_path = get_tool_path('displacement')
     
     try:
         # Determine replication parameters based on b value
@@ -58,7 +60,7 @@ def main():
             tmpbabel = tmp.name
         
         # Run Babel displacement calculation
-        subprocess.run([args.babel_path, tmpbabel], check=True)
+        subprocess.run([displacement_path, tmpbabel], check=True)
         
     finally:
         # Clean up temporary files

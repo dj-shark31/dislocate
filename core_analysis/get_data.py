@@ -26,8 +26,6 @@ def main():
     parser.add_argument('--config', required=True, help='Configuration string (e.g., S, O, etc.)')
     parser.add_argument('--potential_type', required=False , choices=['MEAM', 'DMD', 'RANN', 'ACE', 'MACE'], help='Potential type to use')
     parser.add_argument('--potential_path', required=False, help='Path to potential file')
-    parser.add_argument('--babel_path', required=False, default=abspath_from_script('../../bin/babel/displacement'), help='Path to Babel executable')
-    parser.add_argument('--ovito_path', required=False, default=abspath_from_script('../../bin/ovito.sif'), help='Path to OVITO executable')
     args = parser.parse_args()
 
     # Create temp files
@@ -44,7 +42,7 @@ def main():
         print("Nye computation started")
         run(['python3', abspath_from_script('Babel/get_babel.py'),
              args.dis_cell, args.ref_cell, args.thickness, args.a0, args.natom,
-             args.tmp_pattern, tmp_babel, args.oxygen, '--babel_path', args.babel_path])
+             args.tmp_pattern, tmp_babel, args.oxygen])
         print("Nye computation ended")
 
     # Ovito/fitting computation
@@ -56,8 +54,8 @@ def main():
              '--fitting', args.fitting,
              '--oxygen', args.oxygen,
              '--pbc', args.pbc,
-             '--config', args.config,
-             '--ovito_path', args.ovito_path])
+             '--config', args.config
+            ])
         print("Ovito computation ended")
 
     # Lammps computation
