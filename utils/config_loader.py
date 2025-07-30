@@ -1,13 +1,20 @@
 # utils/config_loader.py
-
 import os
+import sys
 import yaml
 
-def load_config(config_path="config.yaml"):
+# Add the project root to Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from core_analysis.analyze_core import abspath_from_script
+
+def load_config(config_path=abspath_from_script('../config.yaml')):
     if not os.path.exists(config_path):
         raise FileNotFoundError(
             f"Configuration file '{config_path}' not found. "
-            f"Please create one based on 'config.example.yaml'."
+            f"Please create one based on '{abspath_from_script('../config.example.yaml')}'."
         )
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
@@ -23,3 +30,5 @@ def get_tool_path(tool_name, config=None):
             f"Set it under 'tools.{tool_name}'"
         )
     return path
+
+print(get_tool_path('ovitosif'))

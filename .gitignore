@@ -1,2 +1,4 @@
 bin/ovito.sif
 config.yaml
+test/
+potentials/Deepmd_HfTiZr_s0.2_HfScTiYZr_medium_2_epoch100.model

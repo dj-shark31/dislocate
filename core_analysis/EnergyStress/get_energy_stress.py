@@ -7,6 +7,15 @@ Runs EnergyStress calculations using ASE's LAMMPSlib calculator or MACE calculat
 import argparse
 from pathlib import Path
 from ase.io import read
+import os
+import sys
+
+# Add project root to Python path for subprocess compatibility
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(script_dir))  # Go up two levels
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 from utils.atomistic_tools import set_calculator
 
 def main():
@@ -22,7 +31,7 @@ def main():
 
     try:
         atoms = read(args.dis_cell, format='vasp')
-        set_calculator(atoms, args.potential_path, args.potential_type, device='cpu')
+        set_calculator(atoms, potential_path=args.potential_path, potential_type=args.potential_type, device='cpu')
         energy, stress = atoms.get_potential_energy(), atoms.get_stress(voigt=True) * 160217.66208 
         # Energy in eV, stress in MPa [xx, yy, zz, yz, xz, xy]
         with open(args.tmp_energy_stress, 'w') as f:

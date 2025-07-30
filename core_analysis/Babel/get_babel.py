@@ -6,9 +6,17 @@ Handles Babel displacement calculations for dislocation analysis
 
 import argparse
 import os
+import sys
 import subprocess
 import tempfile
-from analyze_core import abspath_from_script
+
+# Add project root to Python path for subprocess compatibility
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(script_dir))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from core_analysis.analyze_core import abspath_from_script
 from utils.config_loader import get_tool_path
 
 def main():
@@ -24,7 +32,7 @@ def main():
                        help='Oxygen flag (0=keep, 1=delete)')
     
     args = parser.parse_args()
-    
+
     displacement_path = get_tool_path('displacement')
     
     try:

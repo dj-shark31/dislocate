@@ -38,10 +38,19 @@ Example usage:
 """
 import argparse
 import os
+import sys
 import tempfile
 import subprocess
 import shlex
 from concurrent.futures import ProcessPoolExecutor
+import shutil
+
+# Add project root to Python path for subprocess compatibility
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 from ase.io import read
 from ase.atoms import Atoms
 from utils.translate_dislocation import reorder_atoms_to_reference
@@ -175,7 +184,7 @@ def main():
     # Reference POSCAR replication (if nrep > 1)
     if nrep > 1:
         # Use ToPoscar.py to replicate along z-direction
-        run(['python3', abspath_from_script('ToPoscar.py'), ref_cell, tmp_ref_poscar, str(oxygen), str(nrep)])
+        run([sys.executable, abspath_from_script('ToPoscar.py'), ref_cell, tmp_ref_poscar, str(oxygen), str(nrep)])
         ref_cell = tmp_ref_poscar
         thickness *= nrep
 
@@ -183,10 +192,12 @@ def main():
     a0, c0, coa0, natom = get_lattice_params_and_natoms_from_poscar(ref_cell, thickness, nx)
 
     # Pattern detection
-    if sf:
-        run(['python3', abspath_from_script('Pattern/get_patternInit.py'), str(a0), str(coa0), tmp_pattern])
+    if sf == "true" and nye == "true":
+        run([sys.executable, abspath_from_script('Pattern/get_patternInit.py'), str(a0), str(coa0), tmp_pattern])
+    elif nye == "true":
+        run([sys.executable, abspath_from_script('Pattern/get_pattern.py'), ref_cell, str(thickness), str(a0), str(natom), tmp_pattern])
     else:
-        run(['python3', abspath_from_script('Pattern/get_pattern.py'), ref_cell, str(thickness), str(a0), str(natom), tmp_pattern])
+        print("Skipping pattern detection")
 
     # Prepare argument sets for get_data.py
     job_args = []
@@ -204,29 +215,17 @@ def main():
     if ncore > 1:
         print("Running in parallel with", ncore, "cores")
         with ProcessPoolExecutor(max_workers=ncore) as executor:
-            futures = [executor.submit(run, [str(x) for x in ['python3', abspath_from_script('get_data.py')] + args]) for args in job_args]
+            futures = [executor.submit(run, [str(x) for x in [sys.executable, abspath_from_script('get_data.py')] + args]) for args in job_args]
             for f in futures:
                 f.result()
     else:
         for args_ in job_args:
             print("Running in serial")
-            run([str(x) for x in ['python3', abspath_from_script('get_data.py')] + args_])
+            run([str(x) for x in [sys.executable, abspath_from_script('get_data.py')] + args_])
 
     # Clean up tmp files
-    for f in [tmp_pattern, tmp_ref_poscar]:
-        try:
-            os.remove(f)
-            print(f"Removed {f}")
-        except Exception:
-            pass
-    # Clean up tmp_dis_cells if defined
-    if 'reordered_dis_cells' in locals():
-        for f in reordered_dis_cells:
-            try:
-                os.remove(f)
-                print(f"Removed {f}")
-            except Exception:
-                pass
+    shutil.rmtree(tmp_dir)
+    print("Removed tmp directory and its contents")
 
 if __name__ == '__main__':
     main() 

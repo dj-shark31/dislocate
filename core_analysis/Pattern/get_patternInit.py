@@ -7,8 +7,15 @@ import argparse
 import tempfile
 import subprocess
 import os
-from analyze_core import abspath_from_script
-import subprocess
+import sys
+
+# Add project root to Python path for subprocess compatibility
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(script_dir))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from core_analysis.analyze_core import abspath_from_script
 from utils.config_loader import get_tool_path
 
 def escape_path(path):

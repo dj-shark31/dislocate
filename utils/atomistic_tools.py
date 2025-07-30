@@ -30,7 +30,7 @@ def set_lammpslib_calculator(potential_type, potential_path):
 def set_calculator(atoms, potential_path, potential_type='MACE', device='cpu'):
     if potential_type in ["MEAM", "DMD", "RANN", "ACE"]:
         calc = set_lammpslib_calculator(potential_type, potential_path)
-    elif potential_type == "MACE":
+    elif potential_type == 'MACE':
         calc = MACECalculator(model_paths=potential_path, device=device)
     else:
         raise ValueError(f"Unsupported potential type: {potential_type}")

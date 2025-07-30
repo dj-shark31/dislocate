@@ -6,7 +6,15 @@ Accounts for the use of fitting_core.py and updated argument names.
 """
 import argparse
 import sys
-from analyze_core import run, abspath_from_script
+import os
+
+# Add project root to Python path for subprocess compatibility
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(script_dir))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from core_analysis.analyze_core import run, abspath_from_script
 from utils.config_loader import get_tool_path
 
 def main():
