@@ -84,6 +84,7 @@ def submit_savio_job(script_name, script_args_dict, job_name="job", partition="s
 def composition_dir(elements, composition):
     """Generate a directory name for a given composition"""
     output_dir = ''.join(elements) + "/"
+    os.makedirs(output_dir, exist_ok=True)
     for i, elem in enumerate(elements):
         if len(elements) == 2:
             output_dir += f"{elem}{composition[i]:.2f}"

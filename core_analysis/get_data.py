@@ -14,7 +14,7 @@ project_root = os.path.dirname(script_dir)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from core_analysis.analyze_core import run, abspath_from_script
+from core_analysis.analyze_core import run
 
 def main():
     parser = argparse.ArgumentParser(description='Orchestrate workflow for a single dislocation configuration (POSCAR-only, keyword arguments)')
@@ -48,7 +48,7 @@ def main():
     # Nye computation
     if args.nye == 'true':
         print("Nye computation started")
-        run([sys.executable, abspath_from_script('Babel/get_babel.py'),
+        run([sys.executable, os.path.join(script_dir, 'Babel/get_babel.py'),
              args.dis_cell, args.ref_cell, args.thickness, args.a0, args.natom,
              args.tmp_pattern, tmp_babel, args.oxygen])
         print("Nye computation ended")
@@ -56,7 +56,7 @@ def main():
     # Ovito/fitting computation
     if args.ovito == 'true' or args.fitting == 'true':
         print("Ovito computation started")
-        run([sys.executable, abspath_from_script('OvitoFitting/get_ovito.py'),
+        run([sys.executable, os.path.join(script_dir, 'OvitoFitting/get_ovito.py'),
              args.dis_cell, args.ref_cell, args.a0, args.thickness,
              tmp_stab, tmp_dxa, tmp_fitting,
              '--fitting', args.fitting,
@@ -69,13 +69,13 @@ def main():
     # Lammps computation
     if args.energy_stress == 'true':
         print("EnergyStress computation started")
-        run([sys.executable, abspath_from_script('EnergyStress/get_energy_stress.py'),
+        run([sys.executable, os.path.join(script_dir, 'EnergyStress/get_energy_stress.py'),
              args.dis_cell, tmp_energy_stress, args.potential_type, args.potential_path])
         print("EnergyStress computation ended")
 
     # Assemble data
     print("Data assemble started")
-    run([sys.executable, abspath_from_script('assemble.py'),
+    run([sys.executable, os.path.join(script_dir, 'assemble.py'),
             args.thickness, args.a0, args.natom, tmp_babel, tmp_stab, tmp_dxa, tmp_fitting, tmp_energy_stress,
             args.output_file, args.energy_stress, args.fitting, args.ovito, args.nye, args.pbc])
     print("Data assemble ended")

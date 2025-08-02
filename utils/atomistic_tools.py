@@ -3,6 +3,9 @@ from mace.calculators import MACECalculator
 import numpy as np
 from pymatgen.core import Structure, Lattice
 from pymatgen.io.ase import AseAtomsAdaptor
+from ase.optimize import BFGS
+from ase.filters import FrechetCellFilter
+from pymatgen.analysis.elasticity import diff_fit, Strain, DeformedStructureSet
 
 def set_lammpslib_calculator(potential_type, potential_path):
     """Setup LAMMPSlib calculator with the specified potential"""
@@ -105,3 +108,53 @@ def build_atoms(structure, n_cells):
     atoms = AseAtomsAdaptor.get_atoms(cell.make_supercell(n_cells))
     atoms.pbc = (True, True, True)
     return atoms
+
+def relax_cell(atoms, potential_path = None, potential_type = 'MACE', device = 'cpu', dof = [True, True, True, False, False, False], fmax = 0.004):
+    """Relax the cell."""
+    set_calculator(atoms, potential_path, potential_type, device)
+    filter = FrechetCellFilter(atoms, dof)
+    dyn = BFGS(filter)
+    dyn.run(fmax=fmax)
+    return atoms
+
+def relax_atoms(atoms, potential_path = None, potential_type = 'MACE', device = 'cpu', fmax = 0.004):
+    """Relax the atoms."""
+    set_calculator(atoms, potential_path, potential_type, device)
+    dyn = BFGS(atoms)
+    dyn.run(fmax=fmax)
+    return atoms
+
+def get_lattice_parameters(atoms, n_cells = [1, 1, 1], potential_path = None, potential_type = 'MACE', device = 'cpu', dof = [True, True, True, False, False, False], fmax = 0.004, phase = 'hcp'):
+    """Get the lattice parameters."""
+    atoms = relax_cell(atoms, potential_path = potential_path, potential_type = potential_type, device = device, dof = dof, fmax = fmax)
+    a1, a2, a3 = get_unit_cell_vectors(atoms, n_cells)
+    if phase == 'hcp' or phase == 'omega':
+        a = (a1 + a2) / 2
+        c = a3
+        return {'a': a, 'c': c}
+    else:
+        a = (a1 + a2 + a3) / 3
+        return {'a': a}
+
+def get_cij(atoms, potential_path = None, potential_type = 'MACE', device = 'cpu', fmax = 0.01, phase = None):
+    """Get the elastic constants."""
+    stresses, strains = [], []
+    eq_stress = get_stress(atoms, potential_path = potential_path, potential_type = potential_type, device = device) * 1e-3 # Convert to GPa
+    structure = AseAtomsAdaptor.get_structure(atoms)
+    deform_set_sym = DeformedStructureSet(structure, symmetry=True)
+    for i, structure in enumerate(deform_set_sym.deformed_structures):
+        atoms_i = structure.to_ase_atoms()
+        atoms_i = relax_atoms(atoms_i, potential_path = potential_path, potential_type = potential_type, device = device, fmax = fmax)
+        stresses.append(get_stress(atoms_i, potential_path = potential_path, potential_type = potential_type, device = device) * 1e-3)
+        strains.append(Strain.from_deformation(deform_set_sym.deformations[i]))
+    
+    cij = diff_fit(strains, stresses, eq_stress=eq_stress, order=2)[0].voigt
+    if phase == 'hcp' or phase == 'omega':
+        c11, c33, c12, c13, c44 = cij[0, 0], cij[2, 2], (cij[0, 1] + cij[1, 0]) / 2, (cij[0, 2] + cij[2, 0]) / 2, cij[3, 3]
+        return {'c11': c11, 'c33': c33, 'c12': c12, 'c13': c13, 'c44': c44}
+    elif phase == 'bcc' or phase == 'fcc':
+        c11, c12, c44 = cij[0, 0], (cij[0, 1] + cij[1, 0]) / 2, cij[3, 3]
+        return {'c11': c11, 'c12': c12, 'c44': c44}
+    else:
+        return cij
+    

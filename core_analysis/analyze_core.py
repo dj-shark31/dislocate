@@ -81,11 +81,6 @@ def run(cmd, **kwargs):
     print('Running:', ' '.join(str(x) for x in cmd))
     return subprocess.run(cmd, check=True, **kwargs)
 
-def abspath_from_script(rel_path):
-    """Return absolute path relative to the directory containing this script."""
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.abspath(os.path.join(script_dir, rel_path))
-
 def main():
     parser = argparse.ArgumentParser(description='Python version of main.sh (POSCAR-only version)')
     parser.add_argument('--input_file', help='Input file with variables')
@@ -104,7 +99,7 @@ def main():
     parser.add_argument('--pbc', help='Whether to use periodic boundary conditions', default='false')
     parser.add_argument('--config', help='Configuration string', default='S')
     parser.add_argument('--nx', type=int, help='Number of unit cells in x direction', default=32)
-    parser.add_argument('--potential_path', help='Path to potential file', default=abspath_from_script('../potentials/Ti.meam'))
+    parser.add_argument('--potential_path', help='Path to potential file', default=os.path.join(script_dir,'../potentials/Ti.meam'))
     parser.add_argument('--potential_type', help='Potential type to use', default='MEAM')
     parser.add_argument('--ref_dis_cells', help='Reference dislocation cell files (space-separated)')
     args = parser.parse_args()
@@ -127,7 +122,7 @@ def main():
         pbc = config.get('pbc', 'false').lower()
         config_str = config.get('config', 'S')
         nx = int(config.get('nx', 32))
-        potential_path = config.get('potential_path', abspath_from_script('../potentials/Ti.meam'))
+        potential_path = config.get('potential_path', os.path.join(script_dir,'../potentials/Ti.meam'))
         potential_type = config.get('potential_type', 'MEAM')
         ref_dis_cells = shlex.split(config.get('ref_dis_cells', ''))
     else:
@@ -184,7 +179,7 @@ def main():
     # Reference POSCAR replication (if nrep > 1)
     if nrep > 1:
         # Use ToPoscar.py to replicate along z-direction
-        run([sys.executable, abspath_from_script('ToPoscar.py'), ref_cell, tmp_ref_poscar, str(oxygen), str(nrep)])
+        run([sys.executable, os.path.join(script_dir, 'ToPoscar.py'), ref_cell, tmp_ref_poscar, str(oxygen), str(nrep)])
         ref_cell = tmp_ref_poscar
         thickness *= nrep
 
@@ -193,9 +188,9 @@ def main():
 
     # Pattern detection
     if sf == "true" and nye == "true":
-        run([sys.executable, abspath_from_script('Pattern/get_patternInit.py'), str(a0), str(coa0), tmp_pattern])
+        run([sys.executable, os.path.join(script_dir, 'Pattern/get_patternInit.py'), str(a0), str(coa0), tmp_pattern])
     elif nye == "true":
-        run([sys.executable, abspath_from_script('Pattern/get_pattern.py'), ref_cell, str(thickness), str(a0), str(natom), tmp_pattern])
+        run([sys.executable, os.path.join(script_dir, 'Pattern/get_pattern.py'), ref_cell, str(thickness), str(a0), str(natom), tmp_pattern])
     else:
         print("Skipping pattern detection")
 
@@ -215,13 +210,13 @@ def main():
     if ncore > 1:
         print("Running in parallel with", ncore, "cores")
         with ProcessPoolExecutor(max_workers=ncore) as executor:
-            futures = [executor.submit(run, [str(x) for x in [sys.executable, abspath_from_script('get_data.py')] + args]) for args in job_args]
+            futures = [executor.submit(run, [str(x) for x in [sys.executable, os.path.join(script_dir, 'get_data.py')] + args]) for args in job_args]
             for f in futures:
                 f.result()
     else:
         for args_ in job_args:
             print("Running in serial")
-            run([str(x) for x in [sys.executable, abspath_from_script('get_data.py')] + args_])
+            run([str(x) for x in [sys.executable, os.path.join(script_dir, 'get_data.py')] + args_])
 
     # Clean up tmp files
     shutil.rmtree(tmp_dir)

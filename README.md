@@ -9,12 +9,11 @@ This package requires Babel for dislocation calculations. You will need to:
 2. Provide path for executable in core_analysis/get_data.py and core_search/ESPM.py 
 
 ### OVITO (Modified Version)
-A modified version of OVITO is required for visualization:
-- The custom OVITO Singularity container (`ovito.sif`) is needed
-- This container will be made available for download (location TBD)
-- Once downloaded, place `ovito.sif` in the `bin/` directory
+A modified version of OVITO written by Eric Rothchild (source code available at https://github.com/Erothch/ovitoWallace) is used to compute the elastic stability parameter, the dxa and common neighbor analysis. 
+For the convenience of the user, the modified OVITO is compiled in a Docker container dj31/ovito-wallace:amd64. Docker is used to run the ovito scripts if supported by the user, otherwise a singularity container can be used. 
+Run this command to download the sif file: `singularity pull ovitowallace.sif docker://dj31/ovito-wallace:amd64`.
 
-Note: The standard OVITO installation will not work - you must use the modified version.
+Note: The dxa and common neighbor analysis can be runned with a non-modified version of ovito.
 
 ## Configuration
 

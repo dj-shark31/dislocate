@@ -8,13 +8,11 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from core_analysis.analyze_core import abspath_from_script
-
-def load_config(config_path=abspath_from_script('../config.yaml')):
+def load_config(config_path=os.path.join(project_root, 'config.yaml')):
     if not os.path.exists(config_path):
         raise FileNotFoundError(
             f"Configuration file '{config_path}' not found. "
-            f"Please create one based on '{abspath_from_script('../config.example.yaml')}'."
+            f"Please create one based on '{os.path.join(project_root, 'config.example.yaml')}'."
         )
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)

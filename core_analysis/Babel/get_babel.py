@@ -16,7 +16,6 @@ project_root = os.path.dirname(os.path.dirname(script_dir))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from core_analysis.analyze_core import abspath_from_script
 from utils.config_loader import get_tool_path
 
 def main():
@@ -50,7 +49,7 @@ def main():
         imm = args.natom * nrep
         
         # Create Babel input file
-        with open(abspath_from_script('input_nye.displacement'), 'r') as f:
+        with open(os.path.join(script_dir, 'input_nye.displacement'), 'r') as f:
             content = f.read()
 
         content = content.replace("A0", str(args.a0))

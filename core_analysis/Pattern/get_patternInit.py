@@ -15,7 +15,6 @@ project_root = os.path.dirname(os.path.dirname(script_dir))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from core_analysis.analyze_core import abspath_from_script
 from utils.config_loader import get_tool_path
 
 def escape_path(path):
@@ -32,7 +31,7 @@ def main():
     patternInit_path = get_tool_path('patternInit')
 
     # Read template
-    with open(abspath_from_script('patternInit.dat'), 'r') as f:
+    with open(os.path.join(script_dir, 'patternInit.dat'), 'r') as f:
         template = f.read()
 
     # Substitute values
