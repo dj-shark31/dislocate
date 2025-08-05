@@ -58,10 +58,7 @@ setup(
             "pytest>=6.0.0",
             "black>=22.0.0",
             "flake8>=4.0.0",
-        ],
-        "lammps": [
-            "lammps>=2022.0",
-        ],
+        ]
     },
     entry_points={
         "console_scripts": [

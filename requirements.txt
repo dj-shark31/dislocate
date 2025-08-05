@@ -20,8 +20,8 @@ torch>=2.2.0
 # OVITO for dislocation analysis (optional)
 # ovito>=3.9.0  # Uncomment if using OVITO Python API directly
 
-# Optional: LAMMPS for LAMMPSlib calculator
-# lammps>=2022.0  # Uncomment if needed
+# LAMMPS for LAMMPSlib calculator (required for LAMMPSlib import)
+lammps>=2022.0
 
 # Development and testing
 pytest>=6.0.0
