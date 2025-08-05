@@ -1,0 +1,26 @@
+include README.md
+include LICENSE
+include requirements.txt
+include config.example.yaml
+include ENVIRONMENT_SETUP.md
+
+# Include SQS cells data
+recursive-include sqs_cells *.out
+recursive-include sqs_cells *.in
+
+# Include examples
+recursive-include examples *
+
+# Include potentials directory
+recursive-include potentials *
+
+# Include any other data files
+recursive-include core_analysis *.md
+recursive-include core_analysis *.template
+
+# Exclude unnecessary files
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude .DS_Store
+global-exclude .git*
+global-exclude test/* 

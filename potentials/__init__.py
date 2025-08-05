@@ -1,1 +1,0 @@
-# This file makes the potentials directory a Python package 

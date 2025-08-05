@@ -17,10 +17,17 @@ PyYAML>=6.0
 mace-torch>=0.3.0
 torch>=2.2.0
 
+# OVITO for dislocation analysis (optional)
+# ovito>=3.9.0  # Uncomment if using OVITO Python API directly
+
 # Optional: LAMMPS for LAMMPSlib calculator
 # lammps>=2022.0  # Uncomment if needed
 
 # Development and testing
 pytest>=6.0.0
 black>=22.0.0
-flake8>=4.0.0 
+flake8>=4.0.0
+
+# Additional dependencies for specific functionality
+pathlib2>=2.3.0; python_version<"3.4"  # For older Python versions
+typing-extensions>=4.0.0; python_version<"3.8"  # For older Python versions 
