@@ -1,1 +1,0 @@
-# This file makes the OvitoFitting directory a Python package 

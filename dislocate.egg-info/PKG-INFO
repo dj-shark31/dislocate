@@ -1,0 +1,87 @@
+Metadata-Version: 2.4
+Name: dislocate
+Version: 0.1.0
+Summary: Python tools for analyzing dislocation core structures
+Home-page: https://github.com/dj-shark31/dislocate
+Author: David Jany
+Author-email: djany31@gmail.com
+Project-URL: Bug Tracker, https://github.com/dj-shark31/dislocate/issues
+Project-URL: Documentation, https://github.com/dj-shark31/dislocate#readme
+Keywords: dislocation,materials science,atomistic simulation,crystal defects,physics
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Physics
+Classifier: Topic :: Scientific/Engineering :: Chemistry
+Classifier: Topic :: Scientific/Engineering :: Materials Science
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.26.0
+Requires-Dist: scipy>=1.13.0
+Requires-Dist: matplotlib>=3.9.0
+Requires-Dist: pandas>=2.3.0
+Requires-Dist: ase>=3.23.0
+Requires-Dist: pymatgen>=2024.8.0
+Requires-Dist: PyYAML>=6.0
+Requires-Dist: mace-torch>=0.3.0
+Requires-Dist: torch>=2.2.0
+Requires-Dist: lammps>=2022.0
+Requires-Dist: pytest>=6.0.0
+Requires-Dist: black>=22.0.0
+Requires-Dist: flake8>=4.0.0
+Requires-Dist: pathlib2>=2.3.0; python_version < "3.4"
+Requires-Dist: typing-extensions>=4.0.0; python_version < "3.8"
+Provides-Extra: dev
+Requires-Dist: pytest>=6.0.0; extra == "dev"
+Requires-Dist: black>=22.0.0; extra == "dev"
+Requires-Dist: flake8>=4.0.0; extra == "dev"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license-file
+Dynamic: project-url
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# dislocate
+Python tools for analyzing dislocation core structures.
+
+## Dependencies
+
+### Babel
+This package requires Babel for dislocation calculations. You will need to:
+1. Download and build Babel from source: http://emmanuel.clouet.free.fr/Programs/Babel
+2. Provide path for executable in core_analysis/get_data.py and core_search/ESPM.py 
+
+### OVITO (Modified Version)
+A modified version of OVITO written by Eric Rothchild (source code available at https://github.com/Erothch/ovitoWallace) is used to compute the elastic stability parameter, the dxa and common neighbor analysis. 
+For the convenience of the user, the modified OVITO is compiled in a Docker container dj31/ovito-wallace:amd64. Docker is used to run the ovito scripts if supported by the user, otherwise a singularity container can be used. 
+Run this command to download the sif file: `singularity pull ovitowallace.sif docker://dj31/ovito-wallace:amd64`.
+
+Note: The dxa and common neighbor analysis can be runned with a non-modified version of ovito.
+
+## Configuration
+
+To run scripts that depend on external tools (e.g. Ovito, Babel), create a `config.yaml` file:
+
+```yaml
+tools:
+  ovitosif: /path/to/ovito.sif
+  babel: /opt/babel/babel
+  displacement: /opt/babel/displacement
+  patternDetect: /opt/babel/patternDetect
+  patternInit: /opt/babel/patternInit

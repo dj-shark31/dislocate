@@ -1,0 +1,24 @@
+numpy>=1.26.0
+scipy>=1.13.0
+matplotlib>=3.9.0
+pandas>=2.3.0
+ase>=3.23.0
+pymatgen>=2024.8.0
+PyYAML>=6.0
+mace-torch>=0.3.0
+torch>=2.2.0
+lammps>=2022.0
+pytest>=6.0.0
+black>=22.0.0
+flake8>=4.0.0
+
+[:python_version < "3.4"]
+pathlib2>=2.3.0
+
+[:python_version < "3.8"]
+typing-extensions>=4.0.0
+
+[dev]
+pytest>=6.0.0
+black>=22.0.0
+flake8>=4.0.0

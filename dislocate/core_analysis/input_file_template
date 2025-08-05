@@ -1,0 +1,56 @@
+# Command: python main.py input_file 4
+
+# Cell thickness (number of unit cells in z direction)
+thickness=2
+
+# Output files for each dislocation configuration (space-separated, one per dis_cell)
+output_files="/path/to/output1.dat /path/to/output2.dat"
+
+# Reference POSCAR file (used for lattice parameters and atom count)
+ref_cell="/path/to/reference_POSCAR"
+
+# Dislocation cell files (space-separated, one per output_file, all POSCAR format)
+dis_cells="/path/to/dislocation1 /path/to/dislocation2"
+
+# Reference Dislocation cell files (cells where atoms have the same order as reference cell)
+ref_dis_cells="/path/to/ref_dislocation1 /path/to/ref_dislocation2"
+
+# Whether to run Energy and Stress calculations (true/false)
+energy_stress=true
+
+# Whether to replicate the reference POSCAR along z (nrep > 1 triggers replication)
+nrep=1
+
+# Whether to run OVITO analysis (true/false)
+ovito=true
+
+# Whether to run Nye tensor analysis (true/false)
+nye=true
+
+# Whether to include stacking fault patterns (true/false)
+sf=true
+
+# Oxygen flag for ToPoscar.py (0=keep oxygen, 1=remove oxygen)
+oxygen=0
+
+# Interatomic potential to use for LAMMPS (e.g., MEAM, RANN, etc.)
+potential=MEAM
+
+# Whether to use periodic boundary conditions (true/false)
+pbc=false
+
+# Whether to use a dislocated POSCAR (true/false)
+disposcar=false
+
+# Configuration string (e.g., S, O, etc.)
+config=S
+
+# Number of unit cells in x direction (for lattice parameter calculation)
+nx=32
+
+# Potential use for energy and stress calculation
+potential_type=MEAM
+
+# Path to potential file
+potential_path='/global/scratch/users/djany/lammps/potentials/Ti.meam'
+

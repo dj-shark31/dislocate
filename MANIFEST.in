@@ -4,14 +4,14 @@ include requirements.txt
 include config.example.yaml
 include ENVIRONMENT_SETUP.md
 
-# Include SQS cells data
+# Include SQS cells data (in root package)
 recursive-include sqs_cells *.out
 recursive-include sqs_cells *.in
 
-# Include examples
+# Include examples (in root package)
 recursive-include examples *
 
-# Include potentials directory
+# Include potentials directory (in root package)
 recursive-include potentials *
 
 # Include any other data files
