@@ -1,0 +1,1 @@
+# This file makes the get_properties_scripts directory a Python package
