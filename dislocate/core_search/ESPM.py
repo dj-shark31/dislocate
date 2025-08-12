@@ -21,11 +21,77 @@ This script performs the following tasks:
 
 The generated structures follow the S configuration pattern typical for dislocation studies.
 
-Example usage: python ESPM.py --reference_cell POSCAR --output_dir ./output --n_cells 8 8 --potential_path /path/to/mace_model.pt --xpos 0 0 10 -10 5 -5 --ypos 5 -5 0 0 5 -5 --babel_path /path/to/babel --fmax 0.0005 --meshing 20 30 --remove_original false --cij 177.1 84.8 82.9 193.8 54.8
+Example usage: python -m dislocate.core_search.ESPM --reference_cell POSCAR --output_dir ./output --n_cells 8 8 --potential_path /path/to/mace_model.pt --xpos 0 0 10 -10 5 -5 --ypos 5 -5 0 0 5 -5 --fmax 0.0005 --meshing 20 30 --remove_original false --cij 177.1 84.8 82.9 193.8 54.8
 """
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-babel_path = get_tool_path('babel')
+
+def babel_make_inputfile(template_path, parameters):
+    """
+    Process Babel input template by replacing placeholders with calculated values.
+    
+    Args:
+        template_path (str): Path to the Babel input template file
+        parameters (dict): Dictionary containing parameter values to substitute
+        
+    Returns:
+        str: Path to the temporary file containing the processed template
+    """
+    # Read the input template for Babel
+    with open(template_path, 'r') as f:
+        content = f.read()
+    
+    # Replace tokens in the template with calculated values
+    for key, value in parameters.items():
+        content = content.replace(key, str(value))
+    
+    # Write the modified template to a temporary file
+    with tempfile.NamedTemporaryFile(mode='w+', delete=False) as tmp:
+        tmp.write(content)
+        tmpbabel = tmp.name
+    
+    return tmpbabel
+
+def babel_make_dipole(template_path, parameters, get_elastic_energy = False):
+    """
+    Run Babel with a processed template.
+    
+    Args:
+        template_path (str): Path to the Babel input template file
+        parameters (dict): Dictionary containing parameter values to substitute
+        get_elastic_energy (bool): Whether to extract elastic energy from output
+        
+    Returns:
+        float or None: Elastic energy value if get_elastic_energy=True and found, None otherwise
+    """
+    # Process the template
+    tmpbabel = babel_make_inputfile(template_path, parameters)
+    
+    try:
+        # Run Babel
+        if get_elastic_energy:
+            result = subprocess.run([get_tool_path('babel'), tmpbabel], check=True, capture_output=True, text=True)
+            
+            # Extract elastic energy from output
+            elastic_energy = None
+            for line in result.stdout.split('\n'):
+                if "Total elastic energy" in line:
+                    # Split the line and get the 16th field (index 15)
+                    fields = line.split()
+                    try:
+                        elastic_energy = float(fields[15])
+                        print(f"Extracted elastic energy: {elastic_energy}")
+                    except (ValueError, IndexError):
+                        print(f"Warning: Could not parse elastic energy from line: {line}")
+                    break
+            
+            return elastic_energy
+        else:
+            subprocess.run([get_tool_path('babel'), tmpbabel], check=True)
+            return None
+    finally:
+        # Clean up temporary file
+        os.remove(tmpbabel)
 
 def main():
     # Argument parser setup
@@ -79,29 +145,27 @@ def main():
         r21_i = r21 + c / 2 * args.xpos[i] / args.meshing[0]
         r22_i = r22 + y / 2 * args.ypos[i] / args.meshing[1]
         outfile = os.path.join(args.output_dir, f"x{args.xpos[i]}_y{args.ypos[i]}_nx{args.n_cells[0]}ny{args.n_cells[1]}.poscar")
-        # Read and modify the input template for Babel
-        with open(os.path.join(script_dir, "input.babel_S"), 'r') as f:
-            content = f.read()
-        # Replace tokens in the template with calculated values
-        content = content.replace("A0", str(a))
-        content = content.replace("R11", str(r11_i))
-        content = content.replace("R21", str(r21_i))
-        content = content.replace("R12", str(r12_i))
-        content = content.replace("R22", str(r22_i))
-        content = content.replace("REFFILE", args.reference_cell)
-        content = content.replace("OUTFILE", outfile)
-        content = content.replace("C11", str(args.cij[0]))
-        content = content.replace("C12", str(args.cij[1]))
-        content = content.replace("C13", str(args.cij[2]))
-        content = content.replace("C33", str(args.cij[3]))
-        content = content.replace("C44", str(args.cij[4]))
-        content = content.replace("C66", str((args.cij[0] - args.cij[1]) / 2))
-        # Write the modified template to a temporary file and run Babel
-        with tempfile.NamedTemporaryFile(mode='w+', delete=False) as tmp:
-            tmp.write(content)
-            tmpbabel = tmp.name
-        subprocess.run([args.babel_path, tmpbabel], check=True)
-        os.remove(tmpbabel)
+        
+        # Prepare parameters for template processing
+        parameters = {
+            "A0": str(a),
+            "R11": str(r11_i),
+            "R21": str(r21_i),
+            "R12": str(r12_i),
+            "R22": str(r22_i),
+            "REFFILE": args.reference_cell,
+            "OUTFILE": outfile,
+            "C11": str(args.cij[0]),
+            "C12": str(args.cij[1]),
+            "C13": str(args.cij[2]),
+            "C33": str(args.cij[3]),
+            "C44": str(args.cij[4]),
+            "C66": str((args.cij[0] - args.cij[1]) / 2)
+        }
+        
+        # Run Babel with processed template
+        template_path = os.path.join(script_dir, "input.babel_S")
+        babel_make_dipole(template_path, parameters)
 
     # Set up the MACE calculator for relaxation
     for i in range(len(args.xpos)):

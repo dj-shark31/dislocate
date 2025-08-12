@@ -21,8 +21,8 @@ def main():
     parser = argparse.ArgumentParser(description='Python version of get_ovito.sh')
     parser.add_argument('--dis_cell', type=str, required=True, help='Dislocation cell file')
     parser.add_argument('--ref_cell', type=str, required=True, help='Reference cell file')
-    parser.add_argument('--b', type=float, required=True, help='Burgers vector magnitude (b)')
-    parser.add_argument('--thickness', type=float, required=True, help='Cell thickness (thickness)')
+    parser.add_argument('--a0', type=float, required=True, help='Lattice parameter a0 (z direction)')
+    parser.add_argument('--thickness', type=int, required=True, help='Cell thickness (thickness)')
     parser.add_argument('--tmp_stab', type=str, required=True, help='Temporary stability file')
     parser.add_argument('--tmp_dxa', type=str, required=True, help='Temporary dxa file')
     parser.add_argument('--tmp_fitting', type=str, required=True, help='Temporary fitting file')
@@ -55,15 +55,15 @@ def main():
          "--reffile", "/mnt/" + os.path.relpath(args.ref_cell, os.getcwd()), 
          "--infile", "/mnt/" + os.path.relpath(args.dis_cell, os.getcwd()), 
          "--outfile", "/mnt/" + os.path.relpath(args.tmp_stab, os.getcwd()),
-         "--b", str(args.b), "--oxygen", str(args.oxygen)])
+         "--a0", args.a0, "--oxygen", args.oxygen])
 
     # Run ovito_dxa.py
     run(container_cmd + ['ovitos',
      "/mnt/" + os.path.relpath(os.path.join(script_dir, "ovito_dxa.py"), os.getcwd()),
      "--infile", "/mnt/" + os.path.relpath(args.dis_cell, os.getcwd()), 
-     "--thickness", str(int(args.thickness)), 
+     "--thickness", args.thickness, 
      "--outfile", "/mnt/" + os.path.relpath(args.tmp_dxa, os.getcwd()), 
-     "--oxygen", str(args.oxygen), 
+     "--oxygen", args.oxygen, 
      "--config", args.config])
 
     # Run fitting_core.py if requested
@@ -71,7 +71,7 @@ def main():
         fit_cmd = [sys.executable, os.path.join(script_dir,"fitting_core.py"),
                    "--outStab", os.path.relpath(args.tmp_stab, os.getcwd()),
                    "--outDXA", os.path.relpath(args.tmp_dxa, os.getcwd()),
-                   "--thickness", str(int(args.thickness)),
+                   "--thickness", args.thickness,
                    "--outFitting", os.path.relpath(args.tmp_fitting, os.getcwd()),
                    '--pbc', args.pbc]
         run(fit_cmd)

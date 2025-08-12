@@ -13,7 +13,7 @@ def main():
     parser.add_argument('--reffile', type=str, required=True, help='Reference filename')
     parser.add_argument('--infile', type=str, required=True, help='Input filename')
     parser.add_argument('--outfile', type=str, required=True, help='Output filename')
-    parser.add_argument('--b', type=float, required=True, help='Burgers vector magnitude')
+    parser.add_argument('--a0', type=float, required=True, help='Lattice parameter a0 (z direction). Magnitude of Burgers vector.')
     parser.add_argument('--oxygen', type=int, choices=[0, 1], default=0,
                        help='Delete oxygen or not (0= no oxygen, 1= delete oxygen)')
     
@@ -36,7 +36,7 @@ def main():
         
     #Add atomic strain modifier - will need to change burgers content appropriately
     modifier = AtomicStrainModBurgers(#burgersContent = [c[0], c[1], c[2]],
-        burgersContent = [0, 0, args.b], #burgers content is with respect to the cartesian frame, our burgers vector is in z direction
+        burgersContent = [0, 0, args.a0], #burgers content is with respect to the cartesian frame, our burgers vector is in z direction
         output_deformation_gradients = True,
             output_strain_tensors = True)
     

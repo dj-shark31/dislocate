@@ -11,9 +11,9 @@ import numpy as np
 
 def get_cna(infile, oxygen):
     #Import the file
-    node = import_file(args.infile)
+    node = import_file(infile)
     
-    if args.oxygen == 1:
+    if oxygen == 1:
         # Select type:
         node.modifiers.append(SelectTypeModifier(types = {2}))
         # Delete selected:

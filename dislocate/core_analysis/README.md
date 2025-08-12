@@ -54,5 +54,5 @@ python main.py input_file 4
 
 - Python 3.x
 - ASE, NumPy, Pandas, Matplotlib, and other scientific Python libraries
-- Modified OVITO (for elastic stability parameter, CNA, DXA). The program automatically uses a remote Docker container (`dj31/ovito-wallace:amd64`) that contains the modified OVITO if possible (if Docker is installed). The other option is for the user to generate a Singularity container from the existing Docker container ()`singularity pull ovitowallace.sif docker://dj31/ovito-wallace:amd64`) and specify the sif file in `config.yaml`. 
+- Modified OVITO (for elastic stability parameter, CNA, DXA). The program automatically uses a remote Docker container (`dj31/ovito-wallace:amd64`) that contains the modified OVITO if possible (if Docker is installed). The other option is for the user to generate a Singularity container from the existing Docker container (`singularity pull ovitowallace.sif docker://dj31/ovito-wallace:amd64`) and specify the sif file in `config.yaml`. 
 - Babel (for Nye tensor calculation). Specify paths to the Babel executables (`babel`, `displacement`, `patternDetect`, and `patternInit`) in `config.yaml`. 

@@ -4,7 +4,7 @@ Python tools for analyzing dislocation core structures in crystalline materials 
 
 ## Overview
 
-The `dislocate` package provides a comprehensive toolkit for;
+The `dislocate` package provides a comprehensive toolkit for:
     - `core_analysis`: analyzing dislocation core structures using atomistic simulations
     - `core_search`: finding (meta)-stable dislocation core structure via the Elastic Singularity Placement Method and NEB Core Search method
     - `utils`: high-throughput computations of lattice parameters, elastic constants of HCP, BCC, and FCC crystal and stacking fault energies of an HCP crsytal and other utility functions.
@@ -32,7 +32,7 @@ It integrates with LAMMPS, OVITO, and Babel to perform automated dislocation ana
 3. **OVITO** (Modified Version):
    - Modified OVITO by Eric Rothchild: https://github.com/Erothch/ovitoWallace
    - Docker container: `dj31/ovito-wallace:amd64`
-   - Singularity: `singularity pull ovito.sif docker://dj31/ovito-wallace:amd64`
+   - Singularity: `singularity pull ovitowallace.sif docker://dj31/ovito-wallace:amd64`
 
 ### Install dislocate
 

@@ -58,7 +58,7 @@ def main():
     if args.ovito == 'true' or args.fitting == 'true':
         print("Ovito computation started")
         run([sys.executable, os.path.join(script_dir, 'OvitoFitting/get_ovito.py'),
-             '--dis_cell', args.dis_cell, '--ref_cell', args.ref_cell, '--b', args.b,
+             '--dis_cell', args.dis_cell, '--ref_cell', args.ref_cell, '--a0', args.a0,
               '--thickness', args.thickness, '--tmp_stab', tmp_stab, '--tmp_dxa', tmp_dxa, 
               '--tmp_fitting', tmp_fitting, '--fitting', args.fitting, '--oxygen', args.oxygen, 
               '--pbc', args.pbc, '--config', args.config
@@ -75,8 +75,8 @@ def main():
     # Assemble data
     print("Data assemble started")
     run([sys.executable, os.path.join(script_dir, 'assemble.py'),
-            args.thickness, args.a0, args.natom, tmp_babel, tmp_stab, tmp_dxa, tmp_fitting, tmp_energy_stress,
-            args.output_file, args.energy_stress, args.fitting, args.ovito, args.nye, args.pbc])
+            '--thickness', args.thickness, '--a0', args.a0, '--natom', args.natom, '--tmp_babel', tmp_babel, '--tmp_stab', tmp_stab, '--tmp_dxa', tmp_dxa, '--tmp_fitting', tmp_fitting, '--tmp_energy_stress', tmp_energy_stress,
+            '--output_file', args.output_file, '--energy_stress', args.energy_stress, '--fitting', args.fitting, '--ovito', args.ovito, '--nye', args.nye, '--pbc', args.pbc])
     print("Data assemble ended")
 
     # Clean up temp files

@@ -6,6 +6,8 @@ from ase import Atoms
 import os
 import argparse
 from typing import List
+import numpy as np
+from ase.geometry import find_mic
 
 """
 Script to calculate the Peierls barrier using the Nudged Elastic Band (NEB) method.
@@ -22,6 +24,77 @@ energy/force calculations and supports:
 
 Example command line: python peierls_barrier_neb.py --initial POSCAR_initial --final POSCAR_final --potential_path /path/to/mace_model.pt --n_images 5 --output_dir neb_results --neb_fmax 0.005 --relax_fmax 0.001 --relax_intermediate_images true --output_preopt_images false --perform_neb true --device cpu
 """
+
+class SubsetNEB(NEB):
+    """
+    NEB where only a subset of atom indices experiences the NEB spring forces.
+    All atoms still feel the real forces from the calculator.
+
+    Parameters
+    ----------
+    images : list[Atoms]
+        NEB images (initial ... final).
+    neb_indices : list[int]
+        Atom indices that should receive the NEB spring contribution.
+    **kwargs : forwarded to ase.neb.NEB
+    """
+    def __init__(self, images, neb_indices, **kwargs):
+        super().__init__(images, **kwargs)
+        self._neb_indices = set(neb_indices)
+
+    def get_forces(self, *args, **kwargs):
+        # NEB total forces: real + spring (returned stacked per image)
+        F_neb = super().get_forces(*args, **kwargs)  # shape: (nimg*natoms, 3)
+
+        # Build the stacked "real" forces by calling calculators directly
+        F_real_blocks = [img.get_forces() for img in self.images]  # list of (natoms, 3)
+        F_real = np.vstack(F_real_blocks)  # (nimg*natoms, 3)
+
+        # For atoms NOT in the subset, strip out the spring contribution:
+        # i.e., set force = real (no spring)
+        nimg = len(self.images)
+        natoms = len(self.images[0])
+        F_mod = F_neb.copy()
+
+        for im in range(nimg):
+            for a in range(natoms):
+                if a not in self._neb_indices:
+                    idx = im * natoms + a
+                    F_mod[idx, :] = F_real[idx, :]
+
+        return F_mod
+
+def atoms_within_circle(atoms: Atoms, center, radius):
+    """
+    Get indices of atoms within a circle in the XY plane.
+
+    Parameters
+    ----------
+    atoms : ase.Atoms
+        Atomic structure.
+    p : tuple[float, float]
+        Center of the circle (px, py) in the same units as positions.
+    r : float
+        Radius of the circle.
+    
+    Returns
+    -------
+    list[int]
+        List of atom indices inside (or on) the circle.
+    """
+    cell = atoms.get_cell()
+    pos = atoms.get_positions()
+
+    # Displacement vectors from p to each atom, projected onto XY
+    dr = pos - np.array([center[0], center[1], 0.0])
+    dr[:, 2] = 0.0
+
+    # Apply minimum-image convention using ASE (respects non-orthogonal cells too)
+    dr_mic, _ = find_mic(dr, cell=cell, pbc=(True, True, False))
+
+    # 2D distances in XY
+    d = np.linalg.norm(dr_mic[:, :2], axis=1)
+    return np.where(d <= radius)[0].tolist()
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -48,6 +121,10 @@ def parse_arguments():
                        help='Perform NEB optimization (default: true)')
     parser.add_argument('--device', type=str, default='cpu',
                        choices=['cpu', 'cuda'], help='Device for MACE calculation (default: cpu)')
+    parser.add_argument('--center', type=float, nargs=2, default=None,
+                       help='Center of the circle for subset NEB (x, y)')
+    parser.add_argument('--radius', type=float, default=None,
+                       help='Radius of the circle for subset NEB')
     return parser.parse_args()
 
 def write_energies(images: List[Atoms], output_file: str) -> None:
@@ -100,7 +177,7 @@ def relax_intermediate_images(images: List[Atoms], potential_path: str, relax_fm
     
 
 def run_neb(initial: Atoms, final: Atoms, n_images: int, potential_path: str, 
-            output_dir: str = None, neb_fmax: float = 0.005, output_preopt: str = "false", device: str = "cpu") -> List[Atoms]:
+            output_dir: str = None, neb_fmax: float = 0.005, output_preopt: str = "false", device: str = "cpu", center: List[float] = None, radius: float = None) -> List[Atoms]:
     """
     Run NEB calculation between initial and final images and save outputs.
     
@@ -123,8 +200,14 @@ def run_neb(initial: Atoms, final: Atoms, n_images: int, potential_path: str,
         images.append(initial.copy())
     images.append(final)
     
+    if center is not None and radius is not None:
+        neb_indices = atoms_within_circle(initial, center, radius)
+        neb = SubsetNEB(images, neb_indices)
+        print(f"Applying NEB spring forces to {len(neb_indices)} atoms within circle of radius {radius} centered at {center}")
+    else:
+        neb = NEB(images)
+    
     # Interpolate linearly between initial and final
-    neb = NEB(images)
     neb.interpolate(mic=True)
     
     # Assign MACE calculator to all images
@@ -174,7 +257,7 @@ def main():
 
         # Run NEB optimization
         images = run_neb(initial, final, args.n_images, args.potential_path, args.output_dir, 
-                                        args.neb_fmax, args.output_preopt_images, args.device)
+                                        args.neb_fmax, args.output_preopt_images, args.device, args.center, args.radius)
 
     else:
         print("Skipping NEB optimization")
