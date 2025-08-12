@@ -22,6 +22,12 @@ It integrates with LAMMPS, OVITO, and Babel to perform automated dislocation ana
 
 ## Installation
 
+### Install
+`pip install git+https://github.com/dj-shark31/dislocate.git`
+
+### Update package
+`pip install --upgrade git+https://github.com/dj-shark31/dislocate.git`
+
 ### Prerequisites
 
 1. **Python 3.8+** with scientific Python stack
