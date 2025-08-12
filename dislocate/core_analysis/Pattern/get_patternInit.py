@@ -23,9 +23,9 @@ def escape_path(path):
 
 def main():
     parser = argparse.ArgumentParser(description='Python version of get_patternInit.sh')
-    parser.add_argument('a0')
-    parser.add_argument('coa0')
-    parser.add_argument('tmp_pattern')
+    parser.add_argument('--a0', type=float, required=True, help='Lattice constant')
+    parser.add_argument('--coa0', type=float, required=True, help='c over a ratio')
+    parser.add_argument('--tmp_pattern', type=str, required=True, help='Temporary pattern file')
     args = parser.parse_args()
 
     patternInit_path = get_tool_path('patternInit')

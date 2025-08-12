@@ -20,11 +20,11 @@ from dislocate.utils.atomistic_tools import set_calculator
 
 def main():
     parser = argparse.ArgumentParser(description='Run EnergyStress calculations using ASE LAMMPSlib or MACE calculator')
-    parser.add_argument('dis_cell', help='Dislocation cell POSCAR file')
-    parser.add_argument('tmp_energy_stress', help='Output file for EnergyStress results')
-    parser.add_argument('potential_type', choices=['MEAM', 'DMD', 'RANN', 'ACE', 'MACE'],
+    parser.add_argument('--dis_cell', type=str, required=True, help='Dislocation cell POSCAR file')
+    parser.add_argument('--tmp_energy_stress', type=str, required=True, help='Output file for EnergyStress results')
+    parser.add_argument('--potential_type', choices=['MEAM', 'DMD', 'RANN', 'ACE', 'MACE'], required=True,
                        help='Potential type to use')
-    parser.add_argument('potential_path', help='Path to potential file')
+    parser.add_argument('--potential_path', type=str, required=True, help='Path to potential file')
     args = parser.parse_args()
 
     Path('tmp').mkdir(exist_ok=True)

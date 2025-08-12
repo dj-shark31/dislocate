@@ -2,7 +2,7 @@
 
 tools:
   ovitosif: /path/to/ovito.sif
-  babel: /opt/babel/babel
-  displacement: /opt/babel/displacement
-  patternDetect: /opt/babel/patternDetect
-  patternInit: /opt/babel/patternInit
+  babel: /opt/babel/bin/babel
+  displacement: /opt/babel/bin/displacement
+  patternDetect: /opt/babel/bin/patternDetect
+  patternInit: /opt/babel/bin/patternInit

@@ -48,21 +48,20 @@ def main():
     # Nye computation
     if args.nye == 'true':
         print("Nye computation started")
-        run([sys.executable, os.path.join(script_dir, 'Babel/get_babel.py'),
-             args.dis_cell, args.ref_cell, args.thickness, args.a0, args.natom,
-             args.tmp_pattern, tmp_babel, args.oxygen])
+        run([sys.executable, os.path.join(script_dir, 'Babel/get_babel.py'), 
+        '--dis_cell', args.dis_cell, '--ref_cell', args.ref_cell, 
+        '--thickness', args.thickness, '--a0', args.a0, '--natom', args.natom, 
+        '--file_pattern', args.tmp_pattern, '--tmp_babel', tmp_babel, '--oxygen', args.oxygen])
         print("Nye computation ended")
 
     # Ovito/fitting computation
     if args.ovito == 'true' or args.fitting == 'true':
         print("Ovito computation started")
         run([sys.executable, os.path.join(script_dir, 'OvitoFitting/get_ovito.py'),
-             args.dis_cell, args.ref_cell, args.a0, args.thickness,
-             tmp_stab, tmp_dxa, tmp_fitting,
-             '--fitting', args.fitting,
-             '--oxygen', args.oxygen,
-             '--pbc', args.pbc,
-             '--config', args.config
+             '--dis_cell', args.dis_cell, '--ref_cell', args.ref_cell, '--b', args.b,
+              '--thickness', args.thickness, '--tmp_stab', tmp_stab, '--tmp_dxa', tmp_dxa, 
+              '--tmp_fitting', tmp_fitting, '--fitting', args.fitting, '--oxygen', args.oxygen, 
+              '--pbc', args.pbc, '--config', args.config
             ])
         print("Ovito computation ended")
 
@@ -70,7 +69,7 @@ def main():
     if args.energy_stress == 'true':
         print("EnergyStress computation started")
         run([sys.executable, os.path.join(script_dir, 'EnergyStress/get_energy_stress.py'),
-             args.dis_cell, tmp_energy_stress, args.potential_type, args.potential_path])
+             '--dis_cell', args.dis_cell, '--tmp_energy_stress', tmp_energy_stress, '--potential_type', args.potential_type, '--potential_path', args.potential_path])
         print("EnergyStress computation ended")
 
     # Assemble data

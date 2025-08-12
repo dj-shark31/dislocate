@@ -53,7 +53,7 @@ def get_energy(atoms, potential_path, potential_type='MACE', device='cpu'):
 
 def get_stress(atoms, potential_path, potential_type='MACE', device='cpu'):
     """
-    Get the energy of an image.
+    Get the stress tensor of an image.
     """
     set_calculator(atoms, potential_path, potential_type, device)
     return atoms.get_stress(voigt=True) * 160217.66208 # Energy in eV, stress in MPa [xx, yy, zz, yz, xz, xy]
@@ -163,7 +163,7 @@ def get_cij(atoms, potential_path = None, potential_type = 'MACE', device = 'cpu
     else:
         return cij
     
-def compute_stacking_fault_energy(atoms, plane, layer, energy_reference, n_cells = [1, 1, 1], output=None, hard_plane = False, potential_path = None, potential_type = 'MACE', device = 'cpu', fmax = 0.005):
+def get_stacking_fault_energy(atoms, plane, layer, energy_reference, n_cells = [1, 1, 1], output=None, hard_plane = False, potential_path = None, potential_type = 'MACE', device = 'cpu', fmax = 0.005):
     """
     Compute the stacking fault energy for a given configuration.
     
@@ -255,8 +255,7 @@ def load_sqs(elements, composition, structure, i):
             '--in_file', sqs_file,
             '--out_file', sqs_out,
             '--a', a,
-            '--c', c,
-            '--coordinate_type', 2])
+            '--c', c])
     else:
         run([sys.executable, os.path.join(project_root, 'utils', 'convert_sqs.py'),
              '--in_file', sqs_file,

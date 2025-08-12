@@ -20,14 +20,14 @@ from dislocate.utils.config_loader import get_tool_path
 
 def main():
     parser = argparse.ArgumentParser(description='Run Babel displacement calculations')
-    parser.add_argument('dis_cell', help='Dislocation cell file')
-    parser.add_argument('ref_cell', help='Reference cell file')
-    parser.add_argument('thickness', type=int, help='Thickness of the slab')
-    parser.add_argument('a0', type=float, help='Lattice parameter')
-    parser.add_argument('natom', type=int, help='Number of atoms')
-    parser.add_argument('file_pattern', help='Pattern file')
-    parser.add_argument('tmp_babel', help='Temporary Babel output file')
-    parser.add_argument('oxygen', type=int, choices=[0, 1], 
+    parser.add_argument('--dis_cell', type=str, required=True, help='Dislocation cell file')
+    parser.add_argument('--ref_cell', type=str, required=True, help='Reference cell file')
+    parser.add_argument('--thickness', type=int, required=True, help='Thickness of the slab')
+    parser.add_argument('--a0', type=float, required=True, help='Lattice parameter')
+    parser.add_argument('--natom', type=int, required=True, help='Number of atoms')
+    parser.add_argument('--file_pattern', type=str, required=True, help='Pattern file')
+    parser.add_argument('--tmp_babel', type=str, required=True, help='Temporary Babel output file')
+    parser.add_argument('--oxygen', type=int, choices=[0, 1], default=0,
                        help='Oxygen flag (0=keep, 1=delete)')
     
     args = parser.parse_args()

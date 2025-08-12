@@ -19,17 +19,17 @@ from dislocate.core_analysis.analyze_core import run
 
 def main():
     parser = argparse.ArgumentParser(description='Python version of get_ovito.sh')
-    parser.add_argument('dis_cell')
-    parser.add_argument('ref_cell')
-    parser.add_argument('b', type=float, help='Burgers vector magnitude (b)')
-    parser.add_argument('thickness', type=float, help='Cell thickness (thickness)')
-    parser.add_argument('tmp_stab')
-    parser.add_argument('tmp_dxa')
-    parser.add_argument('tmp_fitting')
-    parser.add_argument('--fitting', type=str, default='true')
-    parser.add_argument('--oxygen', type=int, default=0)
-    parser.add_argument('--pbc', type=str, default='false')
-    parser.add_argument('--config', default='S')
+    parser.add_argument('--dis_cell', type=str, required=True, help='Dislocation cell file')
+    parser.add_argument('--ref_cell', type=str, required=True, help='Reference cell file')
+    parser.add_argument('--b', type=float, required=True, help='Burgers vector magnitude (b)')
+    parser.add_argument('--thickness', type=float, required=True, help='Cell thickness (thickness)')
+    parser.add_argument('--tmp_stab', type=str, required=True, help='Temporary stability file')
+    parser.add_argument('--tmp_dxa', type=str, required=True, help='Temporary dxa file')
+    parser.add_argument('--tmp_fitting', type=str, required=True, help='Temporary fitting file')
+    parser.add_argument('--fitting', type=str, default='true', help='Fitting flag')
+    parser.add_argument('--oxygen', type=int, default=0, help='Oxygen flag')
+    parser.add_argument('--pbc', type=str, default='false', help='PBC flag')
+    parser.add_argument('--config', default='S', help='Configuration file')
     args = parser.parse_args()
 
     # Try to check if docker is available by running a simple docker command
@@ -52,18 +52,27 @@ def main():
     # Run ovito_elastStab.py
     run(container_cmd + ['ovitos',
          "/mnt/" + os.path.relpath(os.path.join(script_dir, "ovito_elastStab.py"), os.getcwd()),
-         "/mnt/" + os.path.relpath(args.ref_cell, os.getcwd()), "/mnt/" + os.path.relpath(args.dis_cell, os.getcwd()), "/mnt/" + os.path.relpath(args.tmp_stab, os.getcwd()),
-         str(args.b), str(args.oxygen)])
+         "--reffile", "/mnt/" + os.path.relpath(args.ref_cell, os.getcwd()), 
+         "--infile", "/mnt/" + os.path.relpath(args.dis_cell, os.getcwd()), 
+         "--outfile", "/mnt/" + os.path.relpath(args.tmp_stab, os.getcwd()),
+         "--b", str(args.b), "--oxygen", str(args.oxygen)])
 
     # Run ovito_dxa.py
     run(container_cmd + ['ovitos',
      "/mnt/" + os.path.relpath(os.path.join(script_dir, "ovito_dxa.py"), os.getcwd()),
-     "/mnt/" + os.path.relpath(args.dis_cell, os.getcwd()), str(int(args.thickness)), "/mnt/" + os.path.relpath(args.tmp_dxa, os.getcwd()), str(args.oxygen), args.config])
+     "--infile", "/mnt/" + os.path.relpath(args.dis_cell, os.getcwd()), 
+     "--thickness", str(int(args.thickness)), 
+     "--outfile", "/mnt/" + os.path.relpath(args.tmp_dxa, os.getcwd()), 
+     "--oxygen", str(args.oxygen), 
+     "--config", args.config])
 
     # Run fitting_core.py if requested
     if args.fitting == 'true':
         fit_cmd = [sys.executable, os.path.join(script_dir,"fitting_core.py"),
-                   args.tmp_stab, args.tmp_dxa, str(int(args.thickness)), args.tmp_fitting,
+                   "--outStab", os.path.relpath(args.tmp_stab, os.getcwd()),
+                   "--outDXA", os.path.relpath(args.tmp_dxa, os.getcwd()),
+                   "--thickness", str(int(args.thickness)),
+                   "--outFitting", os.path.relpath(args.tmp_fitting, os.getcwd()),
                    '--pbc', args.pbc]
         run(fit_cmd)
 

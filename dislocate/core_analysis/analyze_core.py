@@ -33,8 +33,8 @@ Required input file parameters:
 - potential_path: Path to potential file
 
 Example usage:
-    python analyze_core.py --input_file input_file --ncore 4
-    python analyze_core.py --input_file input_file --ncore 4 --thickness 4 --ref_cell POSCAR --output_files output1.dat output2.dat --dis_cells dis1.poscar dis2.poscar --energy_stress true --fitting true --ovito true --nye true --sf true --nrep 1 --oxygen 0 --pbc false --config S --nx 32 --potential_path /path/to/potential.meam --potential_type MEAM --ref_dis_cells ref1.poscar ref2.poscar
+    python -m dislocate.core_analysis.analyze_core --input_file input_file --ncore 4
+    python -m dislocate.core_analysis.analyze_core --ncore 4 --thickness 4 --ref_cell POSCAR --output_files output1.dat output2.dat --dis_cells dis1.poscar dis2.poscar --energy_stress true --fitting true --ovito true --nye true --sf true --nrep 1 --oxygen 0 --pbc false --config S --nx 32 --potential_path /path/to/potential.meam --potential_type MEAM --ref_dis_cells ref1.poscar ref2.poscar
 """
 import argparse
 import os
@@ -179,7 +179,8 @@ def main():
     # Reference POSCAR replication (if nrep > 1)
     if nrep > 1:
         # Use ToPoscar.py to replicate along z-direction
-        run([sys.executable, os.path.join(script_dir, 'ToPoscar.py'), ref_cell, tmp_ref_poscar, str(oxygen), str(nrep)])
+        run([sys.executable, os.path.join(script_dir, 'ToPoscar.py'), '--infile', ref_cell, '--outfile', tmp_ref_poscar, 
+        '--oxygen', oxygen, '--nrep', nrep])
         ref_cell = tmp_ref_poscar
         thickness *= nrep
 
@@ -188,9 +189,11 @@ def main():
 
     # Pattern detection
     if sf == "true" and nye == "true":
-        run([sys.executable, os.path.join(script_dir, 'Pattern/get_patternInit.py'), str(a0), str(coa0), tmp_pattern])
+        run([sys.executable, os.path.join(script_dir, 'Pattern/get_patternInit.py'), '--a0', a0, '--coa0', coa0, 
+        '--tmp_pattern', tmp_pattern])
     elif nye == "true":
-        run([sys.executable, os.path.join(script_dir, 'Pattern/get_pattern.py'), ref_cell, str(thickness), str(a0), str(natom), tmp_pattern])
+        run([sys.executable, os.path.join(script_dir, 'Pattern/get_pattern.py'), '--ref_cell', ref_cell, 
+        '--thickness', thickness, '--a0', a0, '--natom', natom, '--tmp_pattern', tmp_pattern])
     else:
         print("Skipping pattern detection")
 

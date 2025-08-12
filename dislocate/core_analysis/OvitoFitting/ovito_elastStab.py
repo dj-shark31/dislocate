@@ -10,11 +10,11 @@ from ovito.modifiers import *
 
 def main():
     parser = argparse.ArgumentParser(description='OVITO script for Elastic Stability Analysis')
-    parser.add_argument('reffile', help='Reference filename')
-    parser.add_argument('infile', help='Input filename')
-    parser.add_argument('outfile', help='Output filename')
-    parser.add_argument('b', type=float, help='Burgers vector magnitude')
-    parser.add_argument('oxygen', type=int, choices=[0, 1], 
+    parser.add_argument('--reffile', type=str, required=True, help='Reference filename')
+    parser.add_argument('--infile', type=str, required=True, help='Input filename')
+    parser.add_argument('--outfile', type=str, required=True, help='Output filename')
+    parser.add_argument('--b', type=float, required=True, help='Burgers vector magnitude')
+    parser.add_argument('--oxygen', type=int, choices=[0, 1], default=0,
                        help='Delete oxygen or not (0= no oxygen, 1= delete oxygen)')
     
     args = parser.parse_args()

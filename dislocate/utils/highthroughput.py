@@ -56,7 +56,7 @@ def composition_dir(elements, composition):
     return output_dir
 
 def submit_savio_job(script_name, script_args_dict, job_name="job", partition="savio4_htc", 
-                     cpus=10, time="5:00:00", qos="savio_lowprio", account="co_chrzangroup", nodes=1, ntasks_per_node=1):
+                     cpus=10, time="5:00:00", qos="savio_lowprio", account="account_name", nodes=1, ntasks_per_node=1):
     """
     Submit a generic job to Savio cluster
     
@@ -96,7 +96,7 @@ def submit_savio_job(script_name, script_args_dict, job_name="job", partition="s
 def high_throughput_property(elements = None, delta_x = None, structure = None, n_cells = None, property = None, 
                         plane = None, potential_path = None, potential_type = "MACE", sqs = "false", 
                         base_dir = os.getcwd(), output_cell = "true", device = "cpu", fmax = 0.004, dof = [True, True, True, False, False, False], 
-                        partition="savio4_htc", cpus=10, time="5:00:00", qos="savio_lowprio", account="co_chrzangroup", nodes=1, ntasks_per_node=1):
+                        partition="savio4_htc", cpus=10, time="5:00:00", qos="savio_lowprio", account="account_name", nodes=1, ntasks_per_node=1):
 
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

@@ -9,7 +9,7 @@ project_root = os.path.dirname(script_dir)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from dislocate.utils.atomistic_tools import alloy_randomly, relax_cell, compute_stacking_fault_energy
+from dislocate.utils.atomistic_tools import alloy_randomly, relax_cell, get_stacking_fault_energy
 from dislocate.utils.submitruns import composition_dir
 
 def build_cell(n_cells):
@@ -74,7 +74,7 @@ def main():
         if args.output_cell == "true":
             atoms.write(output_cell, format='vasp')
 
-        energy = compute_stacking_fault_energy(atoms, args.plane, i, energy_reference, n_cells = args.n_cells, output=output_cell, hard_plane = args.hard_plane, potential_path = args.potential_path, potential_type = args.potential_type, device = args.device, fmax = args.fmax)
+        energy = get_stacking_fault_energy(atoms, args.plane, i, energy_reference, n_cells = args.n_cells, output=output_cell, hard_plane = args.hard_plane, potential_path = args.potential_path, potential_type = args.potential_type, device = args.device, fmax = args.fmax)
         sf_energies.append(energy)
 
     # Write results to file

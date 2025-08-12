@@ -28,5 +28,3 @@ def get_tool_path(tool_name, config=None):
             f"Set it under 'tools.{tool_name}'"
         )
     return path
-
-print(get_tool_path('ovitosif'))

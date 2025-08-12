@@ -67,10 +67,10 @@ def fit_gaussian(core_atoms, dislocation_pos, vmin=0, vmax=2):
 
 def main():
     parser = argparse.ArgumentParser(description='Fit core properties from stability and DXA data.')
-    parser.add_argument('outStab', help='Input stability data file (tabular)')
-    parser.add_argument('outDXA', help='Input DXA data file (tabular)')
-    parser.add_argument('thickness', type=int, help='Cell thickness')
-    parser.add_argument('outFitting', help='Output file for fit parameters')
+    parser.add_argument('--outStab', type=str, required=True, help='Input stability data file (tabular)')
+    parser.add_argument('--outDXA', type=str, required=True, help='Input DXA data file (tabular)')
+    parser.add_argument('--thickness', type=int, required=True, help='Cell thickness')
+    parser.add_argument('--outFitting', type=str, required=True, help='Output file for fit parameters')
     parser.add_argument('--pbc', type=str, default='false', help='Enable periodic boundary condition logic')
     args = parser.parse_args()
 

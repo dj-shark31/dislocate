@@ -38,9 +38,9 @@ def get_cna(infile, oxygen):
 
 def main():
     parser = argparse.ArgumentParser(description='OVITO script for Common Neighbor Analysis (CNA)')
-    parser.add_argument('infile', help='Input filename')
-    parser.add_argument('outfile', help='Output filename')
-    parser.add_argument('oxygen', type=int, choices=[0, 1], 
+    parser.add_argument('--infile', type=str, required=True, help='Input filename')
+    parser.add_argument('--outfile', type=str, required=True, help='Output filename')
+    parser.add_argument('--oxygen', type=int, choices=[0, 1], default=0,
                        help='Delete oxygen or not (0= no oxygen, 1= delete oxygen)')
     
     args = parser.parse_args()

@@ -22,11 +22,11 @@ def escape_path(path):
 
 def main():
     parser = argparse.ArgumentParser(description='Python version of get_pattern.sh')
-    parser.add_argument('ref_cell')
-    parser.add_argument('thickness', type=int)
-    parser.add_argument('a0')
-    parser.add_argument('natom', type=int)
-    parser.add_argument('tmp_pattern')
+    parser.add_argument('--ref_cell', type=str, required=True, help='Reference cell file')
+    parser.add_argument('--thickness', type=int, required=True, help='Cell thickness')
+    parser.add_argument('--a0', type=float, required=True, help='Lattice constant')
+    parser.add_argument('--natom', type=int, required=True, help='Number of atoms')
+    parser.add_argument('--tmp_pattern', type=str, required=True, help='Temporary pattern file')
     args = parser.parse_args()
 
     patternDetect_path = get_tool_path('patternDetect')

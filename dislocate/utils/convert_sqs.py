@@ -1,7 +1,7 @@
 '''
 This program reads bestsqs file from user and generates structure file
 either in quantum espresso or VASP format
-To run use "python3 convert_sqs.py bestsqs.out"
+To run use "python convert_sqs.py bestsqs.out"
 '''
 
 import sys
@@ -105,7 +105,7 @@ def main():
     parser.add_argument('--out_file', type=str, required=True, help='Output file')
     parser.add_argument('--a', type=float, required=True, help='a lattice parameter')
     parser.add_argument('--c', type=float, required=False, help='c lattice parameter')
-    parser.add_argument('--coordinate_type', type=int, help='Coordinate type (1: cartesian, 2: fractional)')
+    parser.add_argument('--coordinate_type', type=int, default=1, help='Coordinate type (1: cartesian, 2: fractional)')
     args = parser.parse_args()
 
     data = read_bestsqs(args.in_file)

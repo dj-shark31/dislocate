@@ -6,11 +6,11 @@ from ase.build import make_supercell
 
 #Set up argument parser
 parser = argparse.ArgumentParser(description='Convert LAMMPS data file to POSCAR format using ASE')
-parser.add_argument('infile', help='Input LAMMPS data file')
-parser.add_argument('outfile', help='Output POSCAR file')
-parser.add_argument('oxygen', type=int, choices=[0, 1], 
+parser.add_argument('--infile', type=str, required=True, help='Input LAMMPS data file')
+parser.add_argument('--outfile', type=str, required=True, help='Output POSCAR file')
+parser.add_argument('--oxygen', type=int, choices=[0, 1], default=0,
                    help='Delete oxygen atoms (0= keep oxygen, 1= delete oxygen)')
-parser.add_argument('nrep', type=int, default=1, help='Number of times to replicate the slab')
+parser.add_argument('--nrep', type=int, default=1, help='Number of times to replicate the slab')
 
 #Parse arguments
 args = parser.parse_args()
