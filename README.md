@@ -145,6 +145,10 @@ If you use this software in your research, please cite:
 }
 ```
 
+## Acknowledgement
+
+This repository was completed thanks to the funding provided by the U.S. Office of Naval Research under Grants No. N00014-17-1- 2283, No. N00014-19-1-2376. and the National Science Foundation under Grant No. 2324022.
+
 ## Contact
 
 - **Author**: David Jany
