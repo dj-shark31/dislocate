@@ -11,15 +11,6 @@ The `dislocate` package provides a comprehensive toolkit for:
 
 It integrates with LAMMPS, OVITO, and Babel to perform automated dislocation analysis workflows, including core structure analysis (Nye tensor, elastic stability parameter, core angle, core eccentricty, core surface), and energy calculations.
 
-## Features
-
-- **Automated Dislocation Analysis**: Complete workflow from input structures to core property analysis
-- **Multi-scale Integration**: Seamless integration with LAMMPS, OVITO, and Babel
-- **Parallel Processing**: Support for parallel analysis of multiple dislocation configurations
-- **Machine Learning Potentials**: Built-in support for MACE and other ML potentials
-- **Flexible Analysis**: Configurable analysis steps including energy, stress, and Nye tensor calculations
-- **Visualization**: Tools for visualizing dislocation cores and analysis results
-
 ## Installation
 
 ### Install
