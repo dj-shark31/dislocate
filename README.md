@@ -31,11 +31,6 @@ It integrates with LAMMPS, OVITO, and Babel to perform automated dislocation ana
    - Docker container: `dj31/ovito-wallace:amd64`
    - Singularity: `singularity pull ovitowallace.sif docker://dj31/ovito-wallace:amd64`
 
-### Install dislocate
-
-# Install from github repository
-`python -m pip install git+https://github.com/dj-shark31/dislocate.git`
-
 ## Project Structure
 
 ```
