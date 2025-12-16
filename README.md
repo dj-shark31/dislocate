@@ -47,7 +47,7 @@ dislocate/
 ├── core_search/            # Dislocation core search algorithms
 │   ├── ESPM.py            # Elastic Singularity Positioning Method
 │   |── neb_core_search.py # NEB core search method
-|   └── highthroughput_ESPM.py # Launch ESPM comoputation on supercomupter
+|   └── highthroughput_ESPM.py # Launch ESPM computation on supercomupter
 ├── utils/                  # Utility functions
 │   ├── atomistic_tools.py  # Atomistic simulation tools
 │   ├── translate_dislocation.py # Dislocation dipole translation
